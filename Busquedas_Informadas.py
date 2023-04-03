@@ -1,3 +1,4 @@
+import queue
 import heapq
 from heapq import heappush, heappop
 from math import inf, radians, cos, sin, asin, sqrt
@@ -17,6 +18,29 @@ def heuristic(node):
     a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
     c = 2 * asin(sqrt(a))
     return R * c
+
+# Función para Greedy best-first
+def get_neighbors(node):
+    return graph[node].keys()
+# Función para Greedy best-first
+def greedy(start, goal):
+    queue2 = queue.PriorityQueue()
+    queue2.put((heuristic(start), start))
+    visited = set()
+    while not queue2.empty():
+        node = queue2.get()[1]
+
+        if node == goal:
+            # Si hemos llegado al nodo objetivo, podemos calcular el costo total del camino.
+            return visited
+        visited.add(node)
+
+        for neighbor in get_neighbors(node):
+            if neighbor not in visited:
+                # Al agregar un vecino a la cola de prioridad, utilizamos la heurística para priorizar los nodos.
+                queue2.put((heuristic(neighbor), neighbor))
+
+    return None
 
 #Función para Weighted A*
 def edge_cost(edge):
@@ -99,6 +123,29 @@ def astar(start, goal, graph, heuristic) :
 # Devolvemos los diccionarios de nodos antecesores y costos acumulados
     return came_from, cost_so_far
 
+def beam_search(start_state, goal_fn, expand_fn, beam_width, goal, heuristic):
+    beam = [(0, start_state)]
+    paths = {start_state: [start_state]}
+    while True:
+        next_beam = []
+        for cost, state in beam:
+            for child_state, child_cost in expand_fn(state):
+                new_cost = cost + child_cost
+                h = heuristic(child_state)
+                f = new_cost + h
+                if goal_fn(child_state):
+                    path = paths[state] + [child_state]
+                    return (new_cost, path)
+                next_beam.append((f, child_state))
+                paths[child_state] = paths[state] + [child_state]
+        beam = heapq.nsmallest(beam_width, next_beam, key=lambda x: x[0])
+        if not beam:
+            return None
+        print("Beam:", beam) # imprime el haz de búsqueda en cada iteración
+
+#Función de beam
+def expand_fn(state):
+    return list(graph.get(state, {}).items())
 
 graph = {
     'A': {'B': 1, 'C': 2},
@@ -112,27 +159,33 @@ graph = {
 
 
 start = 'A'
-goal = 'F'
+goal = 'E'
+beam_width = 3
 
+# Ejecutamos el algoritmo Greedy
+visited = greedy(start, goal)
+if visited is not None:
+    print("Resultado Greedy")
+    print(f"El camino más corto desde '{start}' hasta '{goal}' es: {visited}")
+else:
+    print(f"No se pudo encontrar un camino válido desde '{start}' hasta '{goal}'.")
 
-
+# Ejecutamos el algoritmo A* con peso
 path = weighted_astar(start, goal, heuristic, successors, edge_cost, w=1.5)
 print("Resultado weighted A*")
 print(path)
 
 # Ejecutamos el algoritmo A*
-start_node = 'A'
-goal_node = 'F'
-came_from, cost_so_far = astar(start_node, goal_node, graph, heuristic)
+came_from, cost_so_far = astar(start, goal, graph, heuristic)
 
 # Mostramos el resultado
-if goal_node not in came_from:
-    print(f"No se encontró un camino desde {start_node} hasta {goal_node}")
+if goal not in came_from:
+    print(f"No se encontró un camino desde {start} hasta {goal}")
 else:
  # Reconstruimos el camino desde el nodo inicial al nodo objetivo utilizando el diccionario de nodos antecesores
-    path = [goal_node]
-    node = goal_node
-    while node != start_node:
+    path = [goal]
+    node = goal
+    while node != start:
         node = came_from[node]
         path.append(node)
     path.reverse()
@@ -140,3 +193,8 @@ else:
     print("Resultado A*")
     print(" -> ".join(node for node in path))
     #print(f"Costo total: {cost_so_far[goal_node]}")
+
+# Ejecutamos el algoritmo Beam
+result = beam_search(start, lambda n: n == goal, expand_fn, beam_width, goal, heuristic)
+print("Resultado Beam")
+print(result)

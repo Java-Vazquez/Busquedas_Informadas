@@ -147,6 +147,47 @@ def beam_search(start_state, goal_fn, expand_fn, beam_width, goal, heuristic):
 def expand_fn(state):
     return list(graph.get(state, {}).items())
 
+def branch_and_bound_shortest_path(graph, start, end, heuristic_func):
+    """
+    Implementación del algoritmo de búsqueda Branch and Bound para encontrar el camino más corto desde el nodo "start" hasta el nodo "end" en un grafo representado como un diccionario de diccionarios.
+    graph: diccionario de diccionarios que representa el grafo
+    start: nodo de inicio
+    end: nodo de destino
+    heuristic_func: función heurística que estima el costo restante desde un nodo hasta el nodo de destino
+    """
+
+    # Definir la cola de prioridad (heap) y el diccionario de costos mínimos
+    pq = []
+    heapq.heappush(pq, (0 + heuristic_func(start), start, [start], 0))
+    min_costs = {node: float('inf') for node in graph}
+    min_costs[start] = 0 + heuristic_func(start)
+
+    # Recorrer la cola de prioridad hasta encontrar el camino más corto desde el nodo "start" hasta el nodo "end"
+    while pq:
+        cost, node, path, total_cost = heapq.heappop(pq)
+
+        # Si se ha encontrado el nodo de destino, devolver el camino y el costo total
+        if node == end:
+            return path, total_cost
+
+        # Si el costo actual es mayor que el costo mínimo conocido, ignorar el nodo actual
+        if cost > min_costs[node]:
+            continue
+
+        # Explorar los nodos adyacentes al nodo actual
+        for adj_node, adj_cost in graph[node].items():
+            new_cost = cost - heuristic_func(node) + adj_cost + heuristic_func(adj_node)
+            new_path = path + [adj_node]
+            new_total_cost = total_cost + adj_cost
+
+            # Si se ha encontrado un camino más corto al nodo adyacente, actualizar el costo mínimo y agregar el nodo a la cola de prioridad
+            if new_cost < min_costs[adj_node]:
+                min_costs[adj_node] = new_cost
+                heapq.heappush(pq, (new_cost, adj_node, new_path, new_total_cost))
+
+    # Si no se encuentra un camino desde el nodo "start" hasta el nodo "end", devolver None
+    return None
+
 graph = {
     'A': {'B': 1, 'C': 2},
     'B': {'A': 1, 'C': 1, 'D': 2},
@@ -198,3 +239,9 @@ else:
 result = beam_search(start, lambda n: n == goal, expand_fn, beam_width, goal, heuristic)
 print("Resultado Beam")
 print(result)
+
+# Ejecutamos el algoritmo Branch and Bound
+path, cost = branch_and_bound_shortest_path(graph, start, goal, heuristic)
+print("Resultado de Branch and Bound")
+print("Camino más corto:", path)
+print("Costo total:", cost)

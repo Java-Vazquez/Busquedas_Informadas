@@ -1,1 +1,1 @@
-# B-squedas_Informadas
+# Búsquedas_Informadas

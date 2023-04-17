@@ -1,3 +1,6 @@
+from Busquedas_Informadas import *
+
+
 # Función para mostrar el menú y obtener la opción elegida por el usuario
 def mostrar_menu():
     print("Menú:")

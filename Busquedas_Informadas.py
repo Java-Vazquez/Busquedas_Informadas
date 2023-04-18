@@ -52,10 +52,38 @@ La distancia calculada es una estimación de la distancia entre el nodo y el nod
 """
 def heuristic(node): #Javier Vázquez Gurrola 
     # Coordenadas de los nodos
-    latitudes = {'A': 40.4168, 'B': 40.4146, 'C': 40.4262,
-                 'D': 40.4301, 'E': 40.4266, 'F': 40.4297}
-    longitudes = {'A': -3.7038, 'B': -3.7015, 'C': -3.6764,
-                  'D': -3.7007, 'E': -3.6974, 'F': -3.6984}
+    latitudes = {'Cancún': 21.1213285, 'Valladolid': 20.688114, 'Felipe Carrillo Puerto': 19.5778903, 'Campeche': 19.8305682, 'Merida': 20.9800512, 
+                 'Ciudad del Carmen': 18.6118375, 'Chetumal': 18.5221567, 'Villa Hermosa': 17.9925264, 'Tuxtla': 16.7459857, 'Francisco Escarcega': 18.6061556, 
+                 'Acayucan': 17.951096, 'Tehuantepec': 16.320636, 'Alvarado': 18.7760455, 'Oaxaca': 17.0812951, 'Puerto Angel': 15.6679974, 
+                 'Izucar de Matamoros': 18.5980563, 'Tehuacan': 18.462191, 'Pinotepa Nacional': 16.3442895, 'Cuernavaca': 18.9318685, 
+                 'Puebla': 19.040034, 'Acapulco': 16.8354485, 'Cdmx': 19.3898319, 'Iguala': 18.3444, 'Ciudad Altamirano': 18.3547491,
+                 'Cordoba': 18.8901707, 'Chilpancingo': 17.5477072, 'Tlaxcala': 19.4167798, 'Pachuca de Soto': 20.0825056, 'Queretaro': 20.6121228,
+                 'Toluca de Lerdo': 19.294109, 'Zihuatanejo': 17.6405745, 'Veracruz': 19.1787635, 'Tuxpan de Rodriguez Cano': 20.9596561, 
+                 'Atlacomulco': 19.7980152, 'Salamanca': 20.5664927, 'San Luis Potosi': 22.1127046, 'Playa Azul': 17.9842581, 'Tampico': 22.2662251, 
+                 'Guanajuato': 21.0250928, 'Morelia': 19.7036417, 'Guadalajara': 20.6737777, 'Aguascalientes': 21.8857199, 'Zacatecas': 22.7636293,
+                 'Durango': 24.0226824, 'Colima': 19.2400444, 'Manzanillo': 19.0775491, 'Ciudad Victoria': 23.7409928, 'Tepic': 21.5009822, 
+                 'Hidalgo del Parral': 26.9489283, 'Mazatlan': 23.2467283, 'Soto la Marina': 23.7673729, 'Matamoros': 25.8433787, 'Monterrey': 25.6487281, 
+                 'Chihuahua': 28.6708592, 'Topolobampo': 25.6012747, 'Culiacan': 24.8049008, 'Reynosa': 26.0312262, 'Monclova': 26.907775, 
+                 'Ciudad Juárez': 31.6538179, 'Janos': 30.8898127, 'Ciudad Obregon': 27.4827355, 'Torreon': 25.548597, 'Ojinaga': 29.5453292, 
+                 'Nuevo Laredo': 27.4530856, 'Agua Prieta': 31.3115272, 'Guaymas': 27.9272572, 'Piedras Negras': 28.6910517, 'Santa Ana': 30.5345457, 
+                 'Hermosillo': 29.082137, 'Mexicali': 32.6137391, 'Tijuana': 32.4966818, 'San Felipe': 31.009535, 'Ensenada': 31.8423096,
+                 'San Quintin': 30.5711324, 'Santa Rosalia': 27.3408761, 'Santo Domingo': 25.3487297, 'La Paz': 24.1164209, 'Cabo San Lucas': 22.8962253 }
+    
+    longitudes = {'Cancún': -86.9192738, 'Valladolid': -88.2204456, 'Felipe Carrillo Puerto': -88.0630853, 'Campeche': -90.5798365, 'Merida': -89.7029587, 
+                'Ciudad del Carmen': -91.8927345, 'Chetumal': -88.3397982, 'Villa Hermosa': -92.9881407, 'Tuxtla': -93.1996103, 'Francisco Escarcega': -90.8176486, 
+                'Acayucan': -94.9306961, 'Tehuantepec': -95.27521, 'Alvarado': -95.7731952, 'Oaxaca': -96.7707511, 'Puerto Angel': -96.4933733, 
+                'Izucar de Matamoros': -98.5076767, 'Tehuacan': -97.4437333, 'Pinotepa Nacional': -98.1315923, 'Cuernavaca': -99.3106054, 'Puebla': -98.2630056,
+                'Acapulco': -99.9323491, 'Cdmx': -99.7180148, 'Iguala': -99.5652232, 'Ciudad Altamirano': -100.6817619, 'Cordoba': -96.9751108, 
+                'Chilpancingo': -99.5324349, 'Tlaxcala': -98.4471127, 'Pachuca de Soto': -98.8268184, 'Queretaro': -100.4802576, 'Toluca de Lerdo': -99.6662331, 
+                'Zihuatanejo': -101.5601369, 'Veracruz': -96.2113357, 'Tuxpan de Rodriguez Cano': -97.4158767, 'Atlacomulco': -99.89317, 'Salamanca': -101.2176511, 
+                'San Luis Potosi': -101.0261099, 'Playa Azul': -102.357616, 'Tampico': -97.939526, 'Guanajuato': -101.3296402, 'Morelia': -101.2761644, 
+                'Guadalajara': -103.4054536, 'Aguascalientes': -102.36134, 'Zacatecas': -102.623638, 'Durango': -104.7177652, 'Colima': -103.7636273, 'Manzanillo': -104.4789574, 
+                'Ciudad Victoria': -99.1783576, 'Tepic': -104.9119242, 'Hidalgo del Parral': -105.8211168, 'Mazatlan': -106.4923175, 'Soto la Marina': -98.2157573, 
+                'Matamoros': -97.5849847, 'Monterrey': -100.4431819, 'Chihuahua': -106.2047036, 'Topolobampo': -109.0687891, 'Culiacan': -107.4933545, 'Reynosa': -98.3662435, 
+                'Monclova': -101.4940069, 'Ciudad Juárez': -106.5890206, 'Janos': -108.208458, 'Ciudad Obregon': -110.0844111, 'Torreon': -103.4719562, 'Ojinaga': -104.4305246, 
+                'Nuevo Laredo': -99.6881218, 'Agua Prieta': -109.5855873, 'Guaymas': -110.9779564, 'Piedras Negras': -100.5801829, 'Santa Ana': -111.1580567, 
+                'Hermosillo': -111.059027, 'Mexicali': -115.5203312, 'Tijuana': -117.087892, 'San Felipe': -114.8727296, 'Ensenada': -116.6799816, 'San Quintin': -115.9588544, 
+                'Santa Rosalia': -112.2825762, 'Santo Domingo': -111.9975909, 'La Paz': -110.3727673, 'Cabo San Lucas': -109.9505077}
     # Distancia Haversine
     R = 6372.8  # Radio de la Tierra en kilómetros
     
@@ -582,16 +610,88 @@ def mutate_population(population, mutation_rate, graph):
 
 
 graph = {
-    'A': {'B': 1, 'C': 2},
-    'B': {'A': 1, 'C': 1, 'D': 2},
-    'C': {'A': 2, 'B': 1, 'D': 1},
-    'D': {'B': 2, 'C': 1, 'E': 3},
-    'E': {'D': 3, 'F': 1},
-    'F': {'E': 1}
-}
+            'Cancún': {'Valladolid': 90, 'Felipe Carrillo Puerto' : 100 },
+            'Valladolid' : {'Felipe Carrillo Puerto': 90 },
+            'Felipe Carrillo Puerto': {'Campeche' : 60 },
+            'Campeche': { 'Merida': 90, 'Chetumal': 100, 'Ciudad del Carmen' : 90 },
+            'Merida': {},
+            'Chetumal': {'Francisco Escarcega' : 110 },
+            'Francisco Escarcega' : {},
+            'Ciudad del Carmen': {'Villa Hermosa': 90, 'Tuxtla' : 90 },
+            'Villa Hermosa': { 'Acayucan': 90 }, 
+            'Tuxtla': { 'Acayucan' : 90 },
+            'Acayucan': {'Tehuantepec': 80, 'Alvarado' : 110 },
+            'Tehuantepec' : {},
+            'Alvarado'  : { 'Oaxaca' : 100 },
+            'Oaxaca' : { 'Puerto Angel': 90 , 'Tehuacan': 80, 'Izucar de Matamoros': 90 },
+            'Tehuacan' : {},
+            'Puerto Angel' : { 'Pinotepa Nacional' : 100 },
+            'Pinotepa Nacional' : {'Acapulco': 100 },
+            'Acapulco' : { 'Chilpancingo' : 140 },
+            'Chilpancingo' : { 'Iguala': 90 },
+            'Iguala' : { 'Cuernavaca' : 100, 'Ciudad Altamirano': 110 },
+            'Izucar de Matamoros' : {'Puebla': 90,'Cuernavaca':100 },
+            'Puebla' : {'Cordoba':80,'Cdmx' :90 },
+            'Cordoba' : {'Veracruz':90 },
+            'Veracruz' : {},
+            'Cuernavaca' : {'Cdmx':100, 'Ciudad Altamirano': 100},
+            'Cdmx' : {'Pachuca de Soto':100,'Queretaro':90,'Toluca de Lerdo':110,'Tlaxcala':100},
+            'Tlaxcala' : {},
+            'Toluca de Lerdo' : {'Ciudad Altamirano':100 },
+            'Ciudad Altamirano' : {'Zihuatanejo':90},
+            'Zihuatanejo' : {'Playa Azul':90},
+            'Playa Azul' : {'Morelia':100,'Colima':100,'Manzanillo':100},
+            'Morelia' : {'Colima':90, 'Salamanca':90},
+            'Colima' : {'Manzanillo':50, 'Guadalajara':50},
+            'Manzanillo' : {'Guadalajara':80},
+            'Guadalajara' : {'Tepic':110,'Aguascalientes':70},
+            'Salamanca' : {'Guanajuato':90,'Guadalajara':90},
+            'Guanajuato' : { 'Aguascalientes' : 80 },
+            'Aguascalientes' : {'San Luis Potosi': 100 },
+            'Queretaro' : {'Salamanca':90, 'Atlacomulco': 90, 'San Luis Potosi' :90 },
+            'Atlacomulco' : {},
+            'Pachuca de Soto' : {'Tuxpan de Rodriguez Cano':110},
+            'Tuxpan de Rodriguez Cano' : {'Tampico':80},
+            'Tampico' : {'Ciudad Victoria':80},
+            'Ciudad Victoria' : {'Soto la Marina':80,'Matamoros':80,'Monterrey':80,'Durango':80 },
+            'Soto la Marina' : {},
+            'San Luis Potosi' : {'Zacatecas': 90, 'Durango':70},
+            'Zacatecas' :  {},
+            'Tepic' : {'Mazatlan': 110},
+            'Mazatlan' : {'Culiacan':90 },
+            'Durango' : {'Mazatlan': 90, 'Hidalgo del Parral': 90, 'Torreon': 110 },
+            'Torreon' : {'Monclova': 110 },
+            'Matamoros' : { 'Reynosa': 90 },
+            'Reynosa' : {'Nuevo Laredo' : 100 },
+            'Monterrey' : {'Nuevo Laredo': 110 , 'Monclova' :70 },
+            'Nuevo Laredo' : { 'Piedras Negras' : 100 },
+            'Piedras Negras' : { 'Monclova': 100 },
+            'Monclova' : {'Ojinaga': 140 },
+            'Culiacan' : {'Topolobampo':110, 'Hidalgo del Parral': 80 },
+            'Ojinaga' : {'Chihuahua':90 },
+            'Hidalgo del Parral' :  {'Chihuahua' :130 },
+            'Chihuahua' : {'Ciudad Juárez':90,'Janos':90 },
+            'Ciudad Juárez' : {},
+            'Topolobampo' : {'Ciudad Obregon': 90, 'Hidalgo del Parral': 110 },
+            'Ciudad Obregon' : {'Guaymas':80 },
+            'Guaymas' : {'Hermosillo':80 },
+            'Hermosillo' : {'Santa Ana': 60 },
+            'Janos' : {'Agua Prieta' : 110 },
+            'Agua Prieta' : {'Santa Ana': 60 },
+            'Santa Ana' : {'Mexicali': 150 },
+            'Mexicali' : {'San Felipe': 70, 'Tijuana' : 110},
+            'Tijuana' : {'Ensenada' : 50 },
+            'San Felipe' : {'Ensenada' :50 },
+            'Ensenada' : {'San Quintin':60 },
+            'San Quintin' : {'Santa Rosalia': 60},
+            'Santa Rosalia' : {'Santo Domingo' :60},
+            'Santo Domingo' : {'La Paz':70 },
+            'La Paz' : {'Cabo San Lucas':70 },
+            'Cabo San Lucas' : {}
+        }
 
-start = 'A'
-goal = 'E'
+start = 'Cancún'
+goal = 'Cabo San Lucas'
 beam_width = 3
 
 #imprimir el grafo
@@ -676,7 +776,7 @@ while opcion != "11":
     if opcion == "1":
         # Ejecutamos el algoritmo Greedy
         tiempo_inicio = time.time()
-        path = greedy(graph, 'A', 'F')
+        path = greedy(graph, start, goal)
         if path is not None:
             tiempo_fin = time.time()
             tiempo_total_Greedy = (tiempo_fin - tiempo_inicio) * 1000

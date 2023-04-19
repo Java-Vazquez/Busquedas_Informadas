@@ -27,7 +27,7 @@ Integrantes:
 
 Fecha de entrega 26/04/2023
 
-Versión 1.5
+Versión 1.7
 
 El objetivo del código es poder generar búsquedas de maneras informadas comenzando creando una 
 heurística, utilizando la fórmula Haversine. Después iniciamos con la búsqueda greedy, tenemos
@@ -51,6 +51,8 @@ y se devuelve el resultado multiplicado por el radio de la Tierra (R) en kilóme
 La distancia calculada es una estimación de la distancia entre el nodo y el nodo objetivo.
 
 """
+
+
 def heuristic(node): #Javier Vázquez Gurrola 
     # Coordenadas de los nodos
     latitudes = {'Cancún': 21.1213285, 'Valladolid': 20.688114, 'Felipe Carrillo Puerto': 19.5778903, 'Campeche': 19.8305682, 'Merida': 20.9800512, 
@@ -217,7 +219,7 @@ Cuando se llega al nodo objetivo, se devuelve el camino que se tomó para llegar
 
 """
 
-def weighted_astar_con_pasos(start, goal, heuristic, successors, edge_cost, w=1): #Joel Vázquez Anaya
+def weighted_astar_con_pasos(start, goal, heuristic, successors, edge_cost, w): #Joel Vázquez Anaya
     # Creamos la cola de prioridad inicial con el nodo de inicio y su valor heurístico
     frontier = [(heuristic(start), start, 0)]
     print("Creamos la cola de prioridad inicial con el nodo de incio y su heurística")
@@ -273,7 +275,7 @@ def weighted_astar_con_pasos(start, goal, heuristic, successors, edge_cost, w=1)
     print("Si no encontramos un camino, devolvemos una lista vacía")
     return []
 
-def weighted_astar(start, goal, heuristic, successors, edge_cost, w=1): #Javier Vázquez Gurrola 
+def weighted_astar(start, goal, heuristic, successors, edge_cost, w): #Javier Vázquez Gurrola 
     # Creamos la cola de prioridad inicial con el nodo de inicio y su valor heurístico
     frontier = [(heuristic(start), start, 0)]
     # Inicializamos el conjunto de nodos visitados, guardando el nodo, su predecesor y el costo acumulado
@@ -589,7 +591,8 @@ def branch_and_bound_shortest_path_con_pasos(graph, start, end, heuristic_func):
     while pq:
         cost, node, path, total_cost = heapq.heappop(pq)
         print("Recorrer la cola de prioridad hasta encontrar el camino más corto desde el nodo start hasta el nodo end")
-        print(heapq.heappop(pq))
+        print("Costo: ",cost, "Nodo: ", node, "Lista: ",path, "Costo Total: ", total_cost)
+        print("")
         # Si se ha encontrado el nodo de destino, devolver el camino y el costo total
         if node == end:
             print("Si se ha encontrado el nodo de destino, devolver el camino y el costo total")
@@ -1179,7 +1182,7 @@ def menu():#Joel Vázquez Anaya
     print("")
     return opcion
 
-beam_width = 3
+#beam_width = 0
 opcion = None
 opcion_menu2 = None
 banderaOrigen = False
@@ -1216,7 +1219,7 @@ while opcion != "11":
                     print(f"No se pudo encontrar un camino válido desde '{start_verificado}' hasta '{goal_verificado}'.")
                     print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
                 print("----------------------------------------------------------------------------")
-                opcion_menu2 = "0"
+                
                 break
             elif opcion_menu2 == "2":
                 # Ejecutamos el algoritmo Greedy
@@ -1234,7 +1237,7 @@ while opcion != "11":
                     print(f"No se pudo encontrar un camino válido desde '{start_verificado}' hasta '{goal_verificado}'.")
                     print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
                 print("----------------------------------------------------------------------------")
-                opcion_menu2 = "0"
+                
                 break
             else:
                 print("Opción inválida, por favor seleccione una opción del 1 o 2")
@@ -1251,31 +1254,31 @@ while opcion != "11":
             goal_verificado = goal.title()
             banderaDestino = verificacion(goal_verificado)    
         print("-----------------------------------------------------------------------------")
-        
+        w = float(input("Ingrese el peso(W): "))
         if opcion_menu2 == "1":
             # Ejecutamos el algoritmo A* con peso
             tiempo_inicio = time.time()
-            path = weighted_astar_con_pasos(start_verificado, goal_verificado, heuristic, successors, edge_cost, w=1.5)
+            path = weighted_astar_con_pasos(start_verificado, goal_verificado, heuristic, successors, edge_cost, w)
             tiempo_fin = time.time()
             tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)
             print("Resultado weighted A*")
             print(path)
             print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
-            opcion_menu2 = "0"
+            
             break
         
         elif opcion_menu2 == "2":
             # Ejecutamos el algoritmo A* con peso
             tiempo_inicio = time.time()
-            path = weighted_astar(start_verificado, goal_verificado, heuristic, successors, edge_cost, w=1.5)
+            path = weighted_astar(start_verificado, goal_verificado, heuristic, successors, edge_cost, w)
             tiempo_fin = time.time()
             tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)
             print("Resultado weighted A*")
             print(path)
             print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
-            opcion_menu2 = "0"
+            
             break
         
         else:
@@ -1303,7 +1306,7 @@ while opcion != "11":
             # Mostramos el resultado
             if goal not in came_from:
                 print(f"No se encontró un camino desde {start_verificado} hasta {goal_verificado}")
-                opcion_menu2 = "0"
+                
             else:
             # Reconstruimos el camino desde el nodo inicial al nodo objetivo utilizando el diccionario de nodos antecesores
                 path = [goal]
@@ -1318,7 +1321,7 @@ while opcion != "11":
                 print(f"Costo total: {cost_so_far[goal]}")
                 print("La función tardó", tiempo_total_A, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
-            opcion_menu2 = "0"
+            
             break
             
         elif opcion_menu2 == "2":
@@ -1330,7 +1333,7 @@ while opcion != "11":
             # Mostramos el resultado
             if goal not in came_from:
                 print(f"No se encontró un camino desde {start_verificado} hasta {goal_verificado}")
-                opcion_menu2 = "0"
+                
             else:
             # Reconstruimos el camino desde el nodo inicial al nodo objetivo utilizando el diccionario de nodos antecesores
                 path = [goal]
@@ -1345,7 +1348,7 @@ while opcion != "11":
                 print(f"Costo total: {cost_so_far[goal]}")
                 print("La función tardó", tiempo_total_A, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
-            opcion_menu2 = "0"
+            
             break
             
         else:
@@ -1363,6 +1366,7 @@ while opcion != "11":
             goal_verificado = goal.title()
             banderaDestino = verificacion(goal_verificado)
         print("----------------------------------------------------------------------------")
+        beam_width = int(input("Ingrese el valor de anchura del beam en un número entero(beam_width): "))
             
         if opcion_menu2 == "1":
             # Ejecutamos el algoritmo Beam
@@ -1545,8 +1549,21 @@ while opcion != "11":
             
     elif opcion == "10":
         opcion_menu2 = menu_muestra_pasos()
+        while not banderaOrigen: #Joel Vázquez Anaya
+                start = input("Ingresa el nodo de origen: ")
+                start_verificado = start.title()
+                banderaOrigen = verificacion(start_verificado)
+
+        while not banderaDestino: #Joel Vázquez Anaya
+            goal = input("Ingresa el nodo de destino: ")
+            goal_verificado = goal.title()
+            banderaDestino = verificacion(goal_verificado)
+        print("-----------------------------------------------------------------------------")
+        
         if opcion_menu2 == "1":
             # Ejecutamos el algoritmo Greedy
+            
+                print("-------------------------------Greedy------------------------------------------")
                 tiempo_inicio = time.time()
                 path = greedy_con_pasos(graph, start_verificado, goal_verificado)
                 if path is not None:
@@ -1564,8 +1581,10 @@ while opcion != "11":
                 print("")
                 
                 # Ejecutamos el algoritmo A* con peso
+                print("---------------------------------A* con peso---------------------------------")
+                w = float(input("Ingrese el peso(W): "))
                 tiempo_inicio = time.time()
-                path = weighted_astar_con_pasos(start_verificado, goal_verificado, heuristic, successors, edge_cost, w=1.5)
+                path = weighted_astar_con_pasos(start_verificado, goal_verificado, heuristic, successors, edge_cost, w)
                 tiempo_fin = time.time()
                 tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)
                 print("Resultado weighted A*")
@@ -1574,6 +1593,7 @@ while opcion != "11":
                 print("----------------------------------------------------------------------------")
                 
                 # Ejecutamos el algoritmo A*
+                print("--------------------------------- A* ---------------------------------")
                 tiempo_inicio = time.time()
                 came_from, cost_so_far = astar_con_pasos(start_verificado, goal_verificado, graph, heuristic)
                 tiempo_fin = time.time()
@@ -1598,6 +1618,8 @@ while opcion != "11":
                 print("----------------------------------------------------------------------------")
                 
                 # Ejecutamos el algoritmo Beam
+                print("--------------------------------- Beam ---------------------------------")
+                beam_width = int(input("Ingrese el valor de anchura del beam en un número entero(beam_width): "))
                 tiempo_inicio = time.time()
                 result = beam_search_con_pasos(start_verificado, lambda n: n == goal_verificado, expand_fn, beam_width, goal, heuristic)
                 tiempo_fin = time.time()
@@ -1608,6 +1630,7 @@ while opcion != "11":
                 print("----------------------------------------------------------------------------")
                 
                  # Ejecutamos el algoritmo Branch and Bound
+                print("---------------------------------Branch and Bound---------------------------------")
                 tiempo_inicio = time.time()
                 path, cost = branch_and_bound_shortest_path_con_pasos(graph, start_verificado, goal_verificado, heuristic)
                 tiempo_fin = time.time()
@@ -1619,6 +1642,7 @@ while opcion != "11":
                 print("----------------------------------------------------------------------------")
                 
                 #Ejecución del aloritmo Steepest Hil Climbing con pasos
+                print("--------------------------------- Steepest Hil Climbing ---------------------------------")
                 tiempo_inicio = time.time()
                 resultado = steepest_hill_climbing_con_pasos(graph, start_verificado)
                 tiempo_fin = time.time()
@@ -1629,6 +1653,7 @@ while opcion != "11":
                 print("----------------------------------------------------------------------------")
                 
                 #Ejecución del algoritmo Stochastic Hil Clambing con pasos
+                print("--------------------------------- Stochastic Hil Clambing ---------------------------------")
                 tiempo_inicio = time.time()
                 resultado_stochastic = stochastic_hill_climbing_con_pasos(graph, start_verificado, heuristic)
                 tiempo_fin = time.time()
@@ -1641,6 +1666,10 @@ while opcion != "11":
                 #Agregar código de Cisco
                 
                 #Ejecución del algoritmo Genetic Algorithm
+                print("--------------------------------- Genetic Algorithm ---------------------------------")
+                population_size = int(input("Ingrese el tamaño de la población: "))
+                num_generations = int(input("Ingrese el número de generaciones: "))
+                mutation_rate = float(input("Ingrese la taza de mutación que quiere que tenga su población(La taza de mutació puede estar entre el 0 y 1): "))
                 tiempo_inicio = time.time()
                 Resultado_genetic = genetic_algorithm_con_pasos(graph, population_size, num_generations, mutation_rate)
                 tiempo_fin = time.time()
@@ -1664,6 +1693,7 @@ while opcion != "11":
                 banderaDestino = verificacion(goal_verificado)
                 
             # Ejecutamos el algoritmo Greedy
+            print("-------------------------------Greedy------------------------------------------")
             tiempo_inicio = time.time()
             path = greedy(graph, start_verificado, goal_verificado)
             if path is not None:
@@ -1680,22 +1710,13 @@ while opcion != "11":
             print("----------------------------------------------------------------------------")
 
             # Ejecutamos el algoritmo A* con peso
+            print("---------------------------------A* con peso---------------------------------")
+            w = float(input("Ingrese el peso(W): "))
             tiempo_inicio = time.time()
-            path = weighted_astar(start_verificado, goal_verificado, heuristic, successors, edge_cost, w=1.5)
-
-            # Ejecutamos el algoritmo Greedy
-            tiempo_inicio = time.time()
-            path = greedy(graph, start, goal)
-            if path is not None:
-                tiempo_fin = time.time()
-                tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)
-                print("Resultado weighted A*")
-                print(path)
-                print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
-                print("----------------------------------------------------------------------------")
-
+            path = weighted_astar(start_verificado, goal_verificado, heuristic, successors, edge_cost, w)
 
             # Ejecutamos el algoritmo A*
+            print("--------------------------------- A* ---------------------------------")
             tiempo_inicio = time.time()
             came_from, cost_so_far = astar(start_verificado, goal_verificado, graph, heuristic)
             tiempo_fin = time.time()
@@ -1719,6 +1740,8 @@ while opcion != "11":
             print("----------------------------------------------------------------------------")
 
             # Ejecutamos el algoritmo Beam
+            print("--------------------------------- Beam ---------------------------------")
+            beam_width = int(input("Ingrese el valor de anchura del beam en un número entero(beam_width): "))
             tiempo_inicio = time.time()
             result = beam_search(start_verificado, lambda n: n == goal_verificado, expand_fn, beam_width, goal_verificado, heuristic)
             tiempo_fin = time.time()
@@ -1729,6 +1752,7 @@ while opcion != "11":
             print("----------------------------------------------------------------------------")
 
             # Ejecutamos el algoritmo Branch and Bound
+            print("---------------------------------Branch and Bound---------------------------------")
             tiempo_inicio = time.time()
             path, cost = branch_and_bound_shortest_path(graph, start_verificado, goal_verificado, heuristic)
             tiempo_fin = time.time()
@@ -1740,6 +1764,7 @@ while opcion != "11":
             print("----------------------------------------------------------------------------")
 
             #Ejecución del aloritmo Steepest hil climbing
+            print("--------------------------------- Steepest Hil Climbing ---------------------------------")
             tiempo_inicio = time.time()
             resultado = steepest_hill_climbing(graph, start_verificado)
             tiempo_fin = time.time()
@@ -1750,6 +1775,7 @@ while opcion != "11":
             print("----------------------------------------------------------------------------")
 
             #Ejecución del algoritmo Stochastic hil clambing
+            print("--------------------------------- Stochastic Hil Clambing ---------------------------------")
             tiempo_inicio = time.time()
             resultado_stochastic = stochastic_hill_climbing(graph, start_verificado, heuristic)
             tiempo_fin = time.time()
@@ -1759,24 +1785,10 @@ while opcion != "11":
             print("La función tardó", tiempo_total_Stochastic_hil_clambing, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
 
-            #Ejecución del algoritmo Traveling Salesman
-            graph2 = [[0,80,99,1000,1000,1000],[88,0,1000,146,97,1000],[99,1000,0,0,1000,211],[1000,146,0,0,138,1000],[1000,97,1000,138,0,101],[1000,1000,211,1000,101,0]]
-            s = 0
-            tiempo_inicio = time.time()
-            res = travelling_salesman_function(graph2,s)
-            print("La ruta con menos costo es: " + str(res))
-            tiempo_fin = time.time()
-            tiempo_total_Traveling_Salesman = (tiempo_fin - tiempo_inicio)
-            print("La función tardó", tiempo_total_Traveling_Salesman, "segundos en ejecutarse")
-            print("----------------------------------------------------------------------------")
-
-            #Ejecución del algoritmo para generar la imagen del grafo
-            print("----------------------------------------------------------------------------")
-            print(G.nodes())
-            print(G.edges())
-            print_graph(G)
+            #Agregar código cisco
 
             #Ejecución del algoritmo Genetic Algorithm
+            print("--------------------------------- Genetic Algorithm ---------------------------------")
             population_size = int(print("Ingrese el tamaño de la población: "))
             num_generations = int(print("Ingrese el número de generaciones: "))
             mutation_rate = float(print("Ingrese la taza de mutación que quiere que tenga su población: "))

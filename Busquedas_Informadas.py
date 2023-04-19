@@ -906,7 +906,7 @@ while opcion != "11":
     elif opcion == "10":
         # Ejecutamos el algoritmo Greedy
         tiempo_inicio = time.time()
-        path = greedy(graph, 'A', 'F')
+        path = greedy(graph, start, goal)
         if path is not None:
             tiempo_fin = time.time()
             tiempo_total_Greedy = (tiempo_fin - tiempo_inicio) * 1000

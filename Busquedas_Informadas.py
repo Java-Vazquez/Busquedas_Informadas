@@ -998,8 +998,8 @@ def mutate_population(population, mutation_rate, graph): #Joel Vázquez Anaya
 
 def verificacion(nodo): #Javier Vázquez Gurrola 
   bandera = False
-  #todos_los_nodos = ['Cabo San Lucas','La Paz','Santo Domingo','Santa Rosalia','Santa Quintin','Ensenada','San Felipe','Tijuana','Mexicalli','Santa Ana','Agua Prieta','Hermosillo','Janos','Guaymas','Ciudad Obregon','Chihuahua','Juarez','Topolobampo','Hidalgo del Parral','Culiacan','Mazatlan','Tepic','Ojinaga','Monclava','Torreon','Piedras Negras','Nuevo Laredo','Reynosa','Matamoros','Ciudad Victoria','Soto la Marina','Monterrey','Durango','Zacatecas','San Luis Potosi','Aguascalientes','Guanajuato','Guadalajara','Manzanillo','Colima','Salamanca','Atlacomulco','Queretaro','Tlaxcala','Tampico','Tuxpan de Rodiguez Cano','Pachuca de Soto','Playa Azul','Zihuatanejo','Ciudad Altamirano','Iguala','Chilpancingo','Acapulco','Pinotepa Nacional','Puerto Angel','Oaxaca','Cdmx','Cuernavaca','Puebla','Vercruz','Cordoba','Izucar de Matamoros','Tehuacan','Oaxaca','Alvarado','Acayucan','Tehuantepec','Tuxtla','Villa Hermosa','Ciudad del Carmen','Campeche','Merida','Francisco Escarcega','Chetumal','Felipe Carrillo Puerto','Valladolid','Cancún']
-  todos_los_nodos = ['A', 'B', 'C', 'D', 'E', 'F']
+  todos_los_nodos = ['Cabo San Lucas','La Paz','Santo Domingo','Santa Rosalia','Santa Quintin','Ensenada','San Felipe','Tijuana','Mexicalli','Santa Ana','Agua Prieta','Hermosillo','Janos','Guaymas','Ciudad Obregon','Chihuahua','Juarez','Topolobampo','Hidalgo del Parral','Culiacan','Mazatlan','Tepic','Ojinaga','Monclava','Torreon','Piedras Negras','Nuevo Laredo','Reynosa','Matamoros','Ciudad Victoria','Soto la Marina','Monterrey','Durango','Zacatecas','San Luis Potosi','Aguascalientes','Guanajuato','Guadalajara','Manzanillo','Colima','Salamanca','Atlacomulco','Queretaro','Tlaxcala','Tampico','Tuxpan de Rodiguez Cano','Pachuca de Soto','Playa Azul','Zihuatanejo','Ciudad Altamirano','Iguala','Chilpancingo','Acapulco','Pinotepa Nacional','Puerto Angel','Oaxaca','Cdmx','Cuernavaca','Puebla','Vercruz','Cordoba','Izucar de Matamoros','Tehuacan','Oaxaca','Alvarado','Acayucan','Tehuantepec','Tuxtla','Villa Hermosa','Ciudad del Carmen','Campeche','Merida','Francisco Escarcega','Chetumal','Felipe Carrillo Puerto','Valladolid','Cancún']
+  #todos_los_nodos = ['A', 'B', 'C', 'D', 'E', 'F']
   #for elemento in todos_los_nodos:
   if nodo in todos_los_nodos: 
         print("El elemento", nodo, "está en la lista, puede continuar...\n") 
@@ -1009,7 +1009,7 @@ def verificacion(nodo): #Javier Vázquez Gurrola
         print("El elemento", nodo, "no está en la lista, intente de nuevo...\n")
         return bandera
 
-
+#Joel Vázquez Anaya y Javier Vázquez Gurrola 
 graph = {
             'Cancún': {'Valladolid': 90, 'Felipe Carrillo Puerto' : 100 },
             'Valladolid' : {'Felipe Carrillo Puerto': 90 },

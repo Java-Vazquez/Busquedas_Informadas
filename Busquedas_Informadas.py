@@ -10,6 +10,7 @@ import random, math
 import matplotlib.pyplot as plt
 from networkx.algorithms import approximation as approx
 import time
+import sys
 
 #Infromación General
 """
@@ -20,9 +21,9 @@ Universidad Panamericana
 Inteligencia Artificial
 
 Integrantes:
--Javier Vázquez Gurrola (0215391)
--Joel Vázquez Anaya (0201031)
--Francisco Anaya Viveros (0181879)
+-Anaya Viveros Francisco (0181879)
+-Vázquez Anaya Joel (0201031)
+-Vázquez Gurrola Javier (0215391)
 
 Fecha de entrega 26/04/2023
 
@@ -61,7 +62,7 @@ def heuristic(node): #Javier Vázquez Gurrola
     
     # Convertir coordenadas del nodo y del objetivo a radianes
     lat1, lon1 = radians(latitudes[node]), radians(longitudes[node])
-    lat2, lon2 = radians(latitudes[goal]), radians(longitudes[goal])
+    lat2, lon2 = radians(latitudes[goal_verificado]), radians(longitudes[goal_verificado])
     
     # Calcular diferencia de latitud y longitud
     dlat = lat2 - lat1
@@ -93,21 +94,59 @@ Al final del ciclo, se devuelve el conjunto de nodos explorados.
 La heurística utilizada en el código es la función "heuristic", que toma un nodo y devuelve la distancia Haversine entre ese nodo y el nodo objetivo.
 
 """
-def greedy(graph, start, goal): #Javier Vázquez Gurrola 
-   frontier = PriorityQueue()
-   frontier.put(start, 0)
-   explored = set()
-   while not frontier.empty():
-    current = frontier.get()
-    if current == goal:
+
+#Función Greedy con pasos
+def greedy_con_pasos(graph, start, goal): #Joel Vázquez Anaya 
+    frontier = PriorityQueue()
+    frontier.put(start, 0)
+    explored = set()
+    while not frontier.empty():
+        current = frontier.get()
+        print("Imprime actual")
+        print(current)
+        print("")
+        if current == goal:
+            print("Esta es la lista de exploración")
+            print(explored)
+            print("")
+            break
+        explored.add(current)
+        print("Esta es la lista de los nodos explorados")
         print(explored)
-        break
-    explored.add(current)
-    for neighbor in graph[current]:
-        if neighbor not in explored:
-            priority = heuristic(neighbor)
-            frontier.put(neighbor, priority)
-    return explored
+        print("")
+        for neighbor in graph[current]:
+            if neighbor not in explored:
+                print("Imprime los vecinos del nodo actual")
+                print(neighbor)
+                print("")
+                priority = heuristic(neighbor)
+                print("Imprime el vecino prioridad con base a la euristica")
+                print(priority)
+                print("")
+                frontier.put(neighbor, priority)
+                print("Esta es la lista de los nodos explorados")
+                print(explored)
+                print("")
+                print("----------------------------------------------------------------------------------------")
+        return explored
+    
+#Función Greedy sin pasos
+def greedy(graph, start, goal): #Javier Vázquez Gurrola 
+    frontier = PriorityQueue()
+    frontier.put(start, 0)
+    explored = set()
+    while not frontier.empty():
+        current = frontier.get()
+        if current == goal:
+            print(explored)
+            break
+        explored.add(current)
+        for neighbor in graph[current]:
+            if neighbor not in explored:
+                priority = heuristic(neighbor)
+                frontier.put(neighbor, priority)
+                print(frontier)
+        return explored
 """
 La función edge_cost toma una tupla de dos nodos y devuelve el costo de la arista que los conecta en el grafo.
 En otras palabras, dado un borde, esta función devuelve la distancia o el costo de viajar de un nodo a otro.
@@ -148,6 +187,62 @@ El proceso continúa hasta que se llega al nodo objetivo o hasta que la cola de 
 Cuando se llega al nodo objetivo, se devuelve el camino que se tomó para llegar a él.
 
 """
+
+def weighted_astar_con_pasos(start, goal, heuristic, successors, edge_cost, w=1): #Joel Vázquez Anaya
+    # Creamos la cola de prioridad inicial con el nodo de inicio y su valor heurístico
+    frontier = [(heuristic(start), start, 0)]
+    print("Creamos la cola de prioridad inicial con el nodo de incio y su heurística")
+    print(frontier)
+    print("")
+    # Inicializamos el conjunto de nodos visitados, guardando el nodo, su predecesor y el costo acumulado
+    visited = {start: (None, 0)}
+    print("Inicializamos el conjunto de nodos visitados, guardando el nodo, su predecesor y el costo acumulado")
+    print(visited)
+    print("")
+    # Empezamos el bucle principal de búsqueda
+    while frontier:
+        # Sacamos el nodo con menor valor heurístico de la cola de prioridad
+        _, node, cost = heappop(frontier)
+        print("Sacamos el nodo con menor valor heurístico de la cola de prioridad")
+        print(_, node, cost)
+        print("")
+        # Si llegamos al nodo objetivo, reconstruimos el camino y lo devolvemos
+        if node == goal:
+            print("Si llegamos al nodo objetivo, reconstruimos el camino y lo devolvemos")
+            path = [node]
+            print(path)
+            print("")
+            while node != start:
+                node, _ = visited[node]
+                print(node, _)
+                path.append(node)
+                print("Muestra la construcción del camino")
+                print(path)
+                print("")
+            return list(reversed(path))
+        
+        # Para cada sucesor del nodo actual, calculamos el costo y actualizamos los nodos visitados
+        for successor, successor_cost in successors(node).items():
+            print("Para cada sucesor del nodo actual, calculamos el costo y actualizamos los nodos visitados")
+            new_cost = visited[node][1] + edge_cost((node, successor))
+            print("Nuevo costo")
+            print(new_cost)
+            print("")
+            if successor not in visited or new_cost < visited[successor][1]:
+                visited[successor] = (node, new_cost)
+                print("Muestra lista de los nodos visitados con sus sucesores y su nuevo costo")
+                print(visited[successor])
+                print("")
+                # Calculamos la prioridad de la cola de prioridad para el sucesor actual y lo agregamos
+                print("Calculamos la prioridad de la cola de prioridad para el sucesor actual y lo agregamos")
+                priority = new_cost + w * heuristic(successor)
+                print(priority)
+                print("")
+                heappush(frontier, (priority, successor, new_cost))
+                print("----------------------------------------------------------------------------------------")
+    # Si no encontramos un camino, devolvemos una lista vacía
+    print("Si no encontramos un camino, devolvemos una lista vacía")
+    return []
 
 def weighted_astar(start, goal, heuristic, successors, edge_cost, w=1): #Javier Vázquez Gurrola 
     # Creamos la cola de prioridad inicial con el nodo de inicio y su valor heurístico
@@ -209,6 +304,52 @@ Finalmente, devolvemos los diccionarios de nodos antecesores y costos acumulados
 
 """
 
+def astar_con_pasos(start, goal, graph, heuristic) : #Joel Vázquez Anaya
+    frontier = [(0, start)]
+    came_from = {start: None}
+    print("Mostramos el primer nodo")
+    print(came_from)
+    print("")
+    
+    # Inicializamos el costo acumulado del nodo inicial a 0
+    cost_so_far = {start: 0}
+    print("Inicializamos el costo acumulado del nodo inicial a 0")
+    print(cost_so_far)
+    print("")
+    # Iteramos mientras la cola de prioridad tenga elementos
+    while frontier:
+        _, current = heapq.heappop(frontier)
+        print("Iteramos mientras la cola de prioridad tenga elementos")
+        print(_, current)
+# Obtenemos el nodo actual de la cola de prioridad, es decir, el nodo con menor suma de costo acumulado y heurística
+# Si hemos llegado al nodo objetivo, terminamos la búsqueda y devolvemos los diccionarios de nodos antecesores y costos acumulados
+        if current == goal:
+            break
+# Iteramos sobre los nodos adyacentes al nodo actual
+        for next_node, cost in graph[current].items():
+        # Calculamos el costo acumulado para llegar al vecino desde el nodo inicial, sumando el costo acumulado
+        # para llegar al nodo actual y el costo del arco entre el nodo actual y el vecino
+            new_cost = cost_so_far[current] + cost
+            print("Calculamos el costo acumulado para llegar al vecino desde el nodo inicial, sumando el costo acumulado")
+            print(new_cost)
+            # Si el vecino no está en el diccionario de costos acumulados o si hemos encontrado un camino más corto
+            # para llegar al vecino, actualizamos el diccionario de costos acumulados y el diccionario de nodos
+            # antecesores
+            if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
+                cost_so_far[next_node] = new_cost
+                priority = new_cost + heuristic(next_node)
+                heapq.heappush(frontier, (priority, next_node))
+                came_from[next_node] = current
+                print("Actualizamos el diccionario de costos acumulados y el diccionario de nodos antecesores")
+                print(cost_so_far)
+                print("Agregamos el nodo prioridad al directorio")
+                print(priority)
+                print("Actualizamos el nodo recurrente con su nuevo costo")
+                print(came_from)
+# Devolvemos los diccionarios de nodos antecesores y costos acumulados
+    return came_from, cost_so_far
+
+
 def astar(start, goal, graph, heuristic) : #Javier Vázquez Gurrola 
     frontier = [(0, start)]
     came_from = {start: None}
@@ -268,6 +409,78 @@ Si no quedan elementos en el haz de búsqueda, la función devuelve None.
 La función también imprime el haz de búsqueda en cada iteración, lo que puede ser útil para entender cómo se va expandiendo durante la búsqueda.
 
 """
+
+def beam_search_con_pasos(start_state, goal_fn, expand_fn, beam_width, goal, heuristic): #Joel Vázquez Anaya
+    # Inicializamos el beam de búsqueda con el estado inicial y su costo acumulado.
+    beam = [(0, start_state)]
+    print("Inicializamos el beam de búsqueda con el estado inicial y su costo acumulado.")
+    print(beam)
+    print("")
+    # Diccionario que contiene los caminos a cada estado.
+    paths = {start_state: [start_state]}
+    print("Diccionario que contiene los caminos a cada estado.")
+    print(paths)
+    print("")
+    while True:
+    # Creamos una lista que contendrá los estados del siguiente haz de búsqueda.
+        next_beam = []
+        print("Creamos una lista que contendrá los estados del siguiente haz de búsqueda.")
+        print(next_beam)
+        print("")
+        # Iteramos sobre cada estado en el haz de búsqueda actual.
+        print("Iteramos sobre cada estado en el haz de búsqueda actual.")
+        for cost, state in beam:
+        # Iteramos sobre cada estado hijo del nodo actual.
+            for child_state, child_cost in expand_fn(state):
+                print("Iteramos sobre cada estado hijo del nodo actual.")
+            # Calculamos el nuevo costo acumulado para el estado hijo.
+                new_cost = cost + child_cost
+                print("Calculamos el nuevo costo acumulado para el estado hijo.")
+                print(new_cost)
+                print("")
+                # Calculamos la heurística del nodo hijo.
+                h = heuristic(child_state)
+                print("Calculamos la heurística del nodo hijo.")
+                print(h)
+                print("")
+                # Calculamos la función de costo f para el nodo hijo.
+                f = new_cost + h
+                print("Calculamos la función de costo f para el nodo hijo.")
+                print(f)
+                print("")
+                # Si el estado hijo es el objetivo, devolvemos el costo y el camino que lleva hasta él.
+                
+                if goal_fn(child_state):
+                    path = paths[state] + [child_state]
+                    print("Si el estado hijo es el objetivo, devolvemos el costo y el camino que lleva hasta él.")
+                    print(new_cost, path)
+                    print("")
+                    return (new_cost, path)
+                # Si el estado hijo no es el objetivo, agregamos el estado hijo y su función de costo f a la lista de estados
+                # del siguiente haz de búsqueda.
+                next_beam.append((f, child_state))
+                print("Si el estado hijo no es el objetivo, agregamos el estado hijo y su función de costo f a la lista de estados")
+                print(next_beam)
+                print("")
+                # Actualizamos el diccionario de caminos, agregando el estado hijo al camino que lleva hasta él.
+                paths[child_state] = paths[state] + [child_state]
+                print("Actualizamos el diccionario de caminos, agregando el estado hijo al camino que lleva hasta él.")
+                print(paths[child_state])
+                print("")
+                # Seleccionamos los estados con menor función de costo f para formar el siguiente haz de búsqueda.
+        beam = heapq.nsmallest(beam_width, next_beam, key=lambda x: x[0])
+        print("eleccionamos los estados con menor función de costo f para formar el siguiente haz de búsqueda.")
+        print(beam)
+        # Si no quedan estados en el siguiente haz de búsqueda, devolvemos None.
+        if not beam:
+            print("Si no quedan estados en el siguiente haz de búsqueda, devolvemos None.")
+            print(None)
+            print("")
+            return None
+        print("Imprime el beam de búsqueda en cada iteración")
+        print("Beam:", beam) # Imprime el beam de búsqueda en cada iteración
+
+
 def beam_search(start_state, goal_fn, expand_fn, beam_width, goal, heuristic): #Javier Vázquez Gurrola 
     # Inicializamos el beam de búsqueda con el estado inicial y su costo acumulado.
     beam = [(0, start_state)]
@@ -331,6 +544,44 @@ Si no se encuentra un camino desde el nodo de inicio hasta el nodo de destino, s
 En resumen, este código implementa el algoritmo de búsqueda Branch and Bound para encontrar el camino más corto desde 
 un nodo de inicio hasta un nodo de destino en un grafo, utilizando una función heurística para estimar el costo restante hasta el nodo de destino.
 """
+
+def branch_and_bound_shortest_path_con_pasos(graph, start, end, heuristic_func): #Joel Vázquez Anaya
+    # Definir la cola de prioridad (heap) y el diccionario de costos mínimo
+    pq = []
+    heapq.heappush(pq, (0 + heuristic_func(start), start, [start], 0))
+    min_costs = {node: float('inf') for node in graph}
+    min_costs[start] = 0 + heuristic_func(start)
+    print("Definir la cola de prioridad (heap) y el diccionario de costos mínimos")
+    print(pq)
+    print(min_costs)
+    print(min_costs[start])
+    print("")
+    # Recorrer la cola de prioridad hasta encontrar el camino más corto desde el nodo "start" hasta el nodo "end"
+    while pq:
+        cost, node, path, total_cost = heapq.heappop(pq)
+        print("Recorrer la cola de prioridad hasta encontrar el camino más corto desde el nodo start hasta el nodo end")
+        print(heapq.heappop(pq))
+        # Si se ha encontrado el nodo de destino, devolver el camino y el costo total
+        if node == end:
+            print("Si se ha encontrado el nodo de destino, devolver el camino y el costo total")
+            print(path, total_cost)
+            return path, total_cost
+        # Si el costo actual es mayor que el costo mínimo conocido, ignorar el nodo actual
+        if cost > min_costs[node]:
+            continue
+        # Explorar los nodos adyacentes al nodo actual
+        for adj_node, adj_cost in graph[node].items():
+            new_cost = cost - heuristic_func(node) + adj_cost + heuristic_func(adj_node)
+            new_path = path + [adj_node]
+            new_total_cost = total_cost + adj_cost
+            # Si se ha encontrado un camino más corto al nodo adyacente, actualizar el costo mínimo y agregar el nodo a la cola de prioridad
+            if new_cost < min_costs[adj_node]:
+                min_costs[adj_node] = new_cost
+                heapq.heappush(pq, (new_cost, adj_node, new_path, new_total_cost))
+    # Si no se encuentra un camino desde el nodo "start" hasta el nodo "end", devolver None
+    return None
+
+
 def branch_and_bound_shortest_path(graph, start, end, heuristic_func): #Javier Vázquez Gurrola 
     # Definir la cola de prioridad (heap) y el diccionario de costos mínimos
     pq = []
@@ -358,7 +609,52 @@ def branch_and_bound_shortest_path(graph, start, end, heuristic_func): #Javier V
     # Si no se encuentra un camino desde el nodo "start" hasta el nodo "end", devolver None
     return None
 
-# Función de steepest hil climbing
+#Función Steepest Hill Climbing con pasos
+def steepest_hill_climbing_con_pasos(graph, initial_node):# Joel Vázquez Anaya
+    #Guardamos el nodo inicial en una variable denomina nodo actual
+    current_node = initial_node
+    print("Guardamos el nodo inicial en una variable denomina nodo actual")
+    print(current_node ,"=", initial_node)
+    print("")
+    #Creamos un ciclo para que se calcule la heuristica con cada uno de los nodos recurrentes
+    print("Creamos un ciclo para que se calcule la heuristica con cada uno de los nodos recurrentes")
+    while True:
+        #Calculamos la heuristica para el nodo actual  y la comparas con los vecinos
+        current_score = heuristic(current_node)
+        best_score = current_score
+        best_node = current_node
+        print("Calculamos la heuristica para el nodo actual  y la comparas con los vecinos")
+        print("Verificamos cual es el mejor nodo, viendo cual tiene el mejor valor")
+        print(best_score)
+        print("Guardamos el nodo con el mejor valor")
+        print(best_node)
+        print("")
+        
+        #Calcula la heuristica para cada uno de los vecinos del nodo acual y toma el que tenga 
+        #una heuristica mejor para poderlo tomar como el mejor nodo
+        print("Calcula la heuristica para cada uno de los vecinos del nodo acual")
+        for neighbor in graph[current_node]:
+            neighbor_score = heuristic(neighbor)
+            print("Sacamos el valor de la heuristica del vecino")
+            print(graph[current_node])
+            print("Vecino: ", neighbor, "Heuristica: ", neighbor_score)
+            if neighbor_score > best_score:
+                print("Si el valor es menor o igual que el valor del nodo actual regresa el nodo actual ")
+                best_score = neighbor_score
+                best_node = neighbor
+                print("Mejor valor: ", best_score)
+                print("Mejor nodo: ", best_node)
+        # Si es mejor valor es menor o igual que el valor del nodo actual regresa el nodo actual 
+        # porque esa es la mejor opción
+        if best_score <= current_score:
+            print("Sino regresa el nodo actual como el mejor valor")
+            print(current_node)
+            return current_node
+        #Sino regresa el nodo actual como el mejor valor
+        current_node = best_node
+
+
+# Función de Steepest Hil Climbing sin pasos
 def steepest_hill_climbing(graph, initial_node):# Joel Vázquez Anaya
     #Verficamos que el nodo actual sea el nodo inicial y si es así se termina la función
     current_node = initial_node
@@ -381,8 +677,48 @@ def steepest_hill_climbing(graph, initial_node):# Joel Vázquez Anaya
             return current_node
         #Sino regresa el nodo actual como el mejor valor
         current_node = best_node
+        
+#Función Stochastic Hil Clambing con pasos
+def stochastic_hill_climbing_con_pasos(graph, initial_node, heuristic):# Joel Vázquez Anaya
+    #Verificamos si el nodo actual es el nodo de inicio si es asi el programa termina pero
+    #si no es de este modo se hace una virifcación entre cada uno de los nodos vecinos de forma
+    #aleatoria para poder ver el mejor camino con la mayor heuristica
+    current_node = initial_node
+    print("Guardamos el nodo inicial en una variable llamada current_node")
+    print(current_node, "=", initial_node)
+    print("")
+    while True:
+        #Se hace la heuristica al nodo actual para ver su mejor forma
+        current_score = heuristic(current_node)
+        print("Se hace la heuristica al nodo actual para ver su mejor forma")
+        print(current_score)
+        print("")
+        #Se guarda en una lista los nodos la recorridos por el grafo
+        neighbors = graph[current_node]
+        print("Se guarda en una lista los nodos la recorridos por el grafo")
+        print(neighbors)
+        # random.choices() debe recibir una lista y un valor de peso opcional.
+        # En este caso, no se necesita un valor de peso, por lo que simplemente se
+        # convierte el conjunto de vecinos en una lista antes de pasarla a
+        # random.choices().
+        random_neighbor = random.choices(list(neighbors))[0]
+        neighbor_score = heuristic(random_neighbor)
+        print("Utilizamos random.choices() que debe recibir una lista y un valor de peso opcional.")
+        print("simplemente se convierte el conjunto de vecinos en una lista antes de pasarla a random.choices().")
+        print("Vecino elegido aleatoriamente: ",random_neighbor)
+        print("Valor del vecino: ", neighbor_score)
+        
+        if neighbor_score > current_score:
+            print("Si es valor del nodo actual es menor a la del vecino se convierte en el nodo actual")
+            print(current_node)
+            current_node = random_neighbor
+        else:
+            ("Regresa el mejor nodo")
+            print(current_node)
+            return current_node
 
-#Función Stochastic hil clambing
+
+#Función Stochastic Hil Clambing sin pasos
 def stochastic_hill_climbing(graph, initial_node, heuristic):# Joel Vázquez Anaya
     #Verificamos si el nodo actual es el nodo de inicio si es asi el programa termina pero
     #si no es de este modo se hace una virifcación entre cada uno de los nodos vecinos de forma
@@ -472,7 +808,15 @@ def next_perm(l):
     right -= 1
   return True
 
-
+def genetic_algorithm_con_pasos(graph, population_size, num_generations, mutation_rate):# Joel Vázquez Anaya
+    population = generate_initial_population(population_size, graph)
+    for generation in range(num_generations):
+        fitness_scores = [fitness_function(chromosome, graph) for chromosome in population]
+        parent1 , parent2 = select_parents(population)
+        offspring = generate_offspring(parent1 , parent2)
+        population = mutate_population(offspring, mutation_rate,graph)
+    best_chromosome = max(population, key=lambda chromosome: fitness_function(chromosome, graph))
+    return best_chromosome
 
 #Función Genetic Algorithm
 def genetic_algorithm(graph, population_size, num_generations, mutation_rate):# Joel Vázquez Anaya
@@ -493,12 +837,16 @@ esta función toma cada nodo del grafo y los coloca de modo de un directorio par
 mejor solución al problema
  
 """
-def generate_initial_population(population_size, graph):
+def generate_initial_population(population_size, graph): #Joel Vázquez Anaya
     population = []
     nodes = list(graph.keys())
     for i in range(population_size):
+        print("Generar una población de manera aleatoria, esta población es cada uno de los nodos del grafo, los cuales representan una posible solución del problema")
         chromosome = random.sample(nodes, len(nodes))
         population.append(chromosome)
+        print(chromosome)
+        print(population)
+        print("")
     return population
 
 """
@@ -508,12 +856,17 @@ esto quiere decir que ve cuantos vecinos tiene cada uno de los nodos que se ecnu
 en el cromosoma, se busca maximizar los vecinos que son soluciones en el cromosoma
 
 """
-def fitness_function(chromosome, graph):
+def fitness_function(chromosome, graph): #Joel Vázquez Anaya
     fitness = 0
+    print("Vemos la cantidad de vecinos que tiene el nodo")
     for node in graph:
         for neighbor in graph[node]:
             if neighbor in chromosome:
                 fitness += 1
+                print("Nodo: ", chromosome)
+                print("Vecino: ", neighbor)
+                print("Tamaño: ", fitness)
+                print("")
     return fitness
 
 """
@@ -526,11 +879,28 @@ ese lo toma como padre y este procedimiento lo hace 2 veces para tener los 2 pad
 agrega a la lista de mejores andidatos la cual se guarda en padres
 
 """
-def select_parents(population):
+def select_parents(population): #Joel Vázquez Anaya
+    print("Realizamos la cruza de dos padres de manera aleatoria")
+    print("Se hace de ña siguiente manera: ")
+    print("Toma un candidato y lo que hace es que selecciona un nodo de manera aleatoria para poder")
+    print("encontrar a un candidato con el mayor fitness, ya cuando tenga el candidato con mayor fitness")
+    print("ese lo toma como padre y este procedimiento lo hace 2 veces para tener los 2 padres y lo")
+    print("agrega a la lista de mejores andidatos la cual se guarda en padres")
+    print("")
     parent1 = random.choice(population)
     parent2 = random.choice(population)
+    print("Padre 1: ", parent1)
+    print("Padre 2: ", parent2)
+    print("")
     while parent2 == parent1 and len(population) > 1:
+        print("Si el Padre 1 es igual al padre 2 y todavía tenemos más nodos en el arreglo seleccionamos otro Padre de manera aleatoria")
         parent2 = random.choice(population)
+    print("Padre 2: ", parent2)
+    print("")
+    print("Regresamos los padres seleccionados")
+    print("Padre 1: ", parent1)
+    print("Padre 2: ", parent2)
+    print("")
     return parent1, parent2
 
 """
@@ -547,13 +917,19 @@ padre con la segunda parte del segundo padre a partir del punto de cruce para
 formar el descendiente.
 
 """
-def generate_offspring(parent1, parent2):
+def generate_offspring(parent1, parent2): #Joel Vázquez Anaya
+    print("Hacemos a partir de los 2 padres crea una desendencia lo hace a partir de una de las partes de cada uno de los padres")
     if len(parent1) <= 1:  # verificación de longitud de parent1
         return parent1
     crossover_point = random.randrange(1, len(parent1))
     child = parent1[:crossover_point] + parent2[crossover_point:]
-    if random.random() < mutation_rate:
-        mutate_population(child)
+    print("Tomando al tasa de cruce se clona una de las desendencias")
+    print(crossover_point)
+    print("Hijo: ", child)
+    print("")
+    """if random.random() < mutation_rate:
+        print("Llamamos a la función de mutación de la población")
+        mutate_population(child)"""
     return child
 
 
@@ -570,15 +946,39 @@ del grafo, el cromosoma mutado se agrega a una lista de cromosomas mutados, que 
 final de la función.
  
 """
-def mutate_population(population, mutation_rate, graph):
+def mutate_population(population, mutation_rate, graph): #Joel Vázquez Anaya
+    print("Generar una mutación en los cromosomas, esto lo hace tomando de forma aleatoria un nodo del cromosoma para poder realizar la mutación")
+    print("Esto se hace con las siguientes reglas: ")
+    print("Si un número aleatorio generado al azar es menor o igual a la tasa de mutación (mutation_rate), se realiza la mutación")
+    print("Se crea una copia del cromosoma original y se cambia un nodo aleatorio en el cromosoma por otro nodo elegido al azar del grafo")
+    print(" el cromosoma mutado se agrega a una lista de cromosomas mutados, que se devuelve al final de la función")
+    print("")
     mutated_population = []
     for chromosome in population:
         mutated_chromosome = list(chromosome)
         for i in range(len(chromosome)):
             if random.random() < mutation_rate:
+                print("Verificamos la tasa de mutación en un cromosoma")
                 mutated_chromosome[i] = random.choice(list(graph.keys()))
+                print(mutated_chromosome[i])
+                print("")
         mutated_population.append(mutated_chromosome)
+    print("Lista de cromosomas mutados: ", mutated_population)
+    
     return mutated_population
+
+def verificacion(nodo): #Javier Vázquez Gurrola 
+  bandera = False
+  #todos_los_nodos = ['Cabo San Lucas','La Paz','Santo Domingo','Santa Rosalia','Santa Quintin','Ensenada','San Felipe','Tijuana','Mexicalli','Santa Ana','Agua Prieta','Hermosillo','Janos','Guaymas','Ciudad Obregon','Chihuahua','Juarez','Topolobampo','Hidalgo del Parral','Culiacan','Mazatlan','Tepic','Ojinaga','Monclava','Torreon','Piedras Negras','Nuevo Laredo','Reynosa','Matamoros','Ciudad Victoria','Soto la Marina','Monterrey','Durango','Zacatecas','San Luis Potosi','Aguascalientes','Guanajuato','Guadalajara','Manzanillo','Colima','Salamanca','Atlacomulco','Queretaro','Tlaxcala','Tampico','Tuxpan de Rodiguez Cano','Pachuca de Soto','Playa Azul','Zihuatanejo','Ciudad Altamirano','Iguala','Chilpancingo','Acapulco','Pinotepa Nacional','Puerto Angel','Oaxaca','Cdmx','Cuernavaca','Puebla','Vercruz','Cordoba','Izucar de Matamoros','Tehuacan','Oaxaca','Alvarado','Acayucan','Tehuantepec','Tuxtla','Villa Hermosa','Ciudad del Carmen','Campeche','Merida','Francisco Escarcega','Chetumal','Felipe Carrillo Puerto','Valladolid','Cancún']
+  todos_los_nodos = ['A', 'B', 'C', 'D', 'E', 'F']
+  #for elemento in todos_los_nodos:
+  if nodo in todos_los_nodos: 
+        print("El elemento", nodo, "está en la lista, puede continuar...\n") 
+        bandera = True
+        return bandera
+  else: 
+        print("El elemento", nodo, "no está en la lista, intente de nuevo...\n")
+        return bandera
 
 
 graph = {
@@ -653,7 +1053,17 @@ usuario para que no tenga que ver todas las funciones al mismo tiempo o va a ten
 la opción para que el usuario pueda ver todos los algoritmos al mismo tiempo
 
 """
-def menu():
+
+def menu_muestra_pasos():
+    print("Menú muestra para mostrar los pasos")
+    print("1. Ver paso a paso la ejecuación")
+    print("2. Ver solo el resultado")
+    print("---------------------------------------------------------")
+    print("")
+    opcion_menu2 = input("Ingrese el número de la opción que desea: ")
+    return opcion_menu2
+
+def menu():#Joel Vázquez Anaya
     print("Menú:")
     print("1.  Greedy best-first")
     print("2.  A* con peso")
@@ -666,109 +1076,328 @@ def menu():
     print("9.  Genetic Algorithm")
     print("10. Todos los anteriores")
     print("11. Salir del programa")
+    print("---------------------------------------------------------")
+    print("")
     opcion = input("Ingrese el número de la opción que desea: ")
     print("")
     return opcion
 
 opcion = None
+opcion_menu2 = None
+banderaOrigen = False
+banderaDestino = False
+
 while opcion != "11":
     opcion = menu()
     if opcion == "1":
-        # Ejecutamos el algoritmo Greedy
-        tiempo_inicio = time.time()
-        path = greedy(graph, 'A', 'F')
-        if path is not None:
-            tiempo_fin = time.time()
-            tiempo_total_Greedy = (tiempo_fin - tiempo_inicio) * 1000
-            print("Resultado Greedy")
-            print(f"El camino más corto desde '{start}' hasta '{goal}' es: {path}")
-            print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
-        else:
-            tiempo_fin = time.time()
-            tiempo_total_Greedy = (tiempo_fin - tiempo_inicio) * 1000
-            print(f"No se pudo encontrar un camino válido desde '{start}' hasta '{goal}'.")
-            print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
-        
+        while opcion_menu2 != "1":
+            opcion_menu2 = menu_muestra_pasos()
+            while not banderaOrigen: #Joel Vázquez Anaya
+                start = input("Ingresa el nodo de origen: ")
+                start_verificado = start.title()
+                banderaOrigen = verificacion(start_verificado)
+
+            while not banderaDestino: #Joel Vázquez Anaya
+                goal = input("Ingresa el nodo de destino: ")
+                goal_verificado = goal.title()
+                banderaDestino = verificacion(goal_verificado)
+            print("-----------------------------------------------------------------------------")
+            if opcion_menu2 == "1": 
+                # Ejecutamos el algoritmo Greedy
+                tiempo_inicio = time.time()
+                path = greedy_con_pasos(graph, start_verificado, goal_verificado)
+                if path is not None:
+                    tiempo_fin = time.time()
+                    tiempo_total_Greedy = (tiempo_fin - tiempo_inicio)
+                    print("Resultado Greedy")
+                    print(f"El camino más corto desde '{start_verificado}' hasta '{goal_verificado}' es: {path}")
+                    print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
+                else:
+                    tiempo_fin = time.time()
+                    tiempo_total_Greedy = (tiempo_fin - tiempo_inicio)
+                    print(f"No se pudo encontrar un camino válido desde '{start_verificado}' hasta '{goal_verificado}'.")
+                    print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
+                opcion_menu2 = "0"
+                break
+            elif opcion_menu2 == "2":
+                # Ejecutamos el algoritmo Greedy
+                tiempo_inicio = time.time()
+                path = greedy(graph, start_verificado, goal_verificado)
+                if path is not None:
+                    tiempo_fin = time.time()
+                    tiempo_total_Greedy = (tiempo_fin - tiempo_inicio)
+                    print("Resultado Greedy")
+                    print(f"El camino más corto desde '{start_verificado}' hasta '{goal_verificado}' es: {path}")
+                    print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
+                else:
+                    tiempo_fin = time.time()
+                    tiempo_total_Greedy = (tiempo_fin - tiempo_inicio)
+                    print(f"No se pudo encontrar un camino válido desde '{start_verificado}' hasta '{goal_verificado}'.")
+                    print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
+                opcion_menu2 = "0"
+                break
+            else:
+                print("Opción inválida, por favor seleccione una opción del 1 o 2")
+                
     elif opcion == "2":
-        # Ejecutamos el algoritmo A* con peso
-        tiempo_inicio = time.time()
-        path = weighted_astar(start, goal, heuristic, successors, edge_cost, w=1.5)
-        tiempo_fin = time.time()
-        tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)*1000
-        print("Resultado weighted A*")
-        print(path)
-        print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+        opcion_menu2 = menu_muestra_pasos()
+        while not banderaOrigen: #Joel Vázquez Anaya
+                start = input("Ingresa el nodo de origen: ")
+                start_verificado = start.title()
+                banderaOrigen = verificacion(start_verificado)
+
+        while not banderaDestino: #Joel Vázquez Anaya
+            goal = input("Ingresa el nodo de destino: ")
+            goal_verificado = goal.title()
+            banderaDestino = verificacion(goal_verificado)    
+        print("-----------------------------------------------------------------------------")
         
-    elif opcion == "3":
-        # Ejecutamos el algoritmo A*
-        tiempo_inicio = time.time()
-        came_from, cost_so_far = astar(start, goal, graph, heuristic)
-        tiempo_fin = time.time()
-        tiempo_total_A = (tiempo_fin - tiempo_inicio) * 1000
-        # Mostramos el resultado
-        if goal not in came_from:
-            print(f"No se encontró un camino desde {start} hasta {goal}")
+        if opcion_menu2 == "1":
+            # Ejecutamos el algoritmo A* con peso
+            tiempo_inicio = time.time()
+            path = weighted_astar_con_pasos(start_verificado, goal_verificado, heuristic, successors, edge_cost, w=1.5)
+            tiempo_fin = time.time()
+            tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)
+            print("Resultado weighted A*")
+            print(path)
+            print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            break
+        
+        elif opcion_menu2 == "2":
+            # Ejecutamos el algoritmo A* con peso
+            tiempo_inicio = time.time()
+            path = weighted_astar(start_verificado, goal_verificado, heuristic, successors, edge_cost, w=1.5)
+            tiempo_fin = time.time()
+            tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)
+            print("Resultado weighted A*")
+            print(path)
+            print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            break
+        
         else:
-        # Reconstruimos el camino desde el nodo inicial al nodo objetivo utilizando el diccionario de nodos antecesores
-            path = [goal]
-            node = goal
-            while node != start:
-                node = came_from[node]
-                path.append(node)
-            path.reverse()
-        # Imprimimos el camino y el costo total
-            print("Resultado A*")
-            print(" -> ".join(node for node in path))
-            print(f"Costo total: {cost_so_far[goal]}")
-            print("La función tardó", tiempo_total_A, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+            print("Opción inválida, por favor seleccione una opción del 1 o 2")
+
+    elif opcion == "3":
+        opcion_menu2 = menu_muestra_pasos()
+        while not banderaOrigen: #Joel Vázquez Anaya
+                start = input("Ingresa el nodo de origen: ")
+                start_verificado = start.title()
+                banderaOrigen = verificacion(start_verificado)
+
+        while not banderaDestino: #Joel Vázquez Anaya
+            goal = input("Ingresa el nodo de destino: ")
+            goal_verificado = goal.title()
+            banderaDestino = verificacion(goal_verificado)
+        print("-----------------------------------------------------------------------------")
+        
+        if opcion_menu2 == "1":    
+            # Ejecutamos el algoritmo A*
+            tiempo_inicio = time.time()
+            came_from, cost_so_far = astar_con_pasos(start_verificado, goal_verificado, graph, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_A = (tiempo_fin - tiempo_inicio)
+            # Mostramos el resultado
+            if goal not in came_from:
+                print(f"No se encontró un camino desde {start_verificado} hasta {goal_verificado}")
+                opcion_menu2 = "0"
+            else:
+            # Reconstruimos el camino desde el nodo inicial al nodo objetivo utilizando el diccionario de nodos antecesores
+                path = [goal]
+                node = goal
+                while node != start:
+                    node = came_from[node]
+                    path.append(node)
+                path.reverse()
+            # Imprimimos el camino y el costo total
+                print("Resultado A*")
+                print(" -> ".join(node for node in path))
+                print(f"Costo total: {cost_so_far[goal]}")
+                print("La función tardó", tiempo_total_A, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            break
+            
+        elif opcion_menu2 == "2":
+            # Ejecutamos el algoritmo A*
+            tiempo_inicio = time.time()
+            came_from, cost_so_far = astar(start_verificado, goal_verificado, graph, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_A = (tiempo_fin - tiempo_inicio)
+            # Mostramos el resultado
+            if goal not in came_from:
+                print(f"No se encontró un camino desde {start_verificado} hasta {goal_verificado}")
+                opcion_menu2 = "0"
+            else:
+            # Reconstruimos el camino desde el nodo inicial al nodo objetivo utilizando el diccionario de nodos antecesores
+                path = [goal]
+                node = goal
+                while node != start:
+                    node = came_from[node]
+                    path.append(node)
+                path.reverse()
+            # Imprimimos el camino y el costo total
+                print("Resultado A*")
+                print(" -> ".join(node for node in path))
+                print(f"Costo total: {cost_so_far[goal]}")
+                print("La función tardó", tiempo_total_A, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            break
+            
+        else:
+            print("Opción inválida, por favor seleccione una opción del 1 o 2")
         
     elif opcion == "4":
-        # Ejecutamos el algoritmo Beam
-        tiempo_inicio = time.time()
-        result = beam_search(start, lambda n: n == goal, expand_fn, beam_width, goal, heuristic)
-        tiempo_fin = time.time()
-        tiempo_total_Beam = (tiempo_fin - tiempo_inicio) * 1000
-        print("Resultado Beam")
-        print(result)
-        print("La función tardó", tiempo_total_Beam, "segundos en ejecutarse")
+        opcion_menu2 = menu_muestra_pasos()
+        while not banderaOrigen: #Joel Vázquez Anaya
+                start = input("Ingresa el nodo de origen: ")
+                start_verificado = start.title()
+                banderaOrigen = verificacion(start_verificado)
+
+        while not banderaDestino: #Joel Vázquez Anaya
+            goal = input("Ingresa el nodo de destino: ")
+            goal_verificado = goal.title()
+            banderaDestino = verificacion(goal_verificado)
         print("----------------------------------------------------------------------------")
+            
+        if opcion_menu2 == "1":
+            # Ejecutamos el algoritmo Beam
+            tiempo_inicio = time.time()
+            result = beam_search_con_pasos(start_verificado, lambda n: n == goal_verificado, expand_fn, beam_width, goal, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_Beam = (tiempo_fin - tiempo_inicio)
+            print("Resultado Beam")
+            print(result)
+            print("La función tardó", tiempo_total_Beam, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+            
+        elif opcion_menu2 == "2":
+            # Ejecutamos el algoritmo Beam
+            tiempo_inicio = time.time()
+            result = beam_search(start_verificado, lambda n: n == goal_verificado, expand_fn, beam_width, goal, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_Beam = (tiempo_fin - tiempo_inicio)
+            print("Resultado Beam")
+            print(result)
+            print("La función tardó", tiempo_total_Beam, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+            
+        else:
+            print("Opción inválida, por favor seleccione una opción del 1 o 2")
         
     elif opcion == "5":
-        # Ejecutamos el algoritmo Branch and Bound
-        tiempo_inicio = time.time()
-        path, cost = branch_and_bound_shortest_path(graph, start, goal, heuristic)
-        tiempo_fin = time.time()
-        tiempo_total_Breanch_and_Bound = (tiempo_fin - tiempo_inicio) * 1000
-        print("Resultado de Branch and Bound")
-        print("Camino más corto:", path)
-        print("Costo total:", cost)
-        print("La función tardó", tiempo_total_Breanch_and_Bound, "segundos en ejecutarse")
+        opcion_menu2 = menu_muestra_pasos()
+        while not banderaOrigen: #Joel Vázquez Anaya
+                start = ""
+                start = input("Ingresa el nodo de origen: ")
+                start_verificado = start.title()
+                banderaOrigen = verificacion(start_verificado)
+
+        while not banderaDestino: #Joel Vázquez Anaya
+            goal = input("Ingresa el nodo de destino: ")
+            goal_verificado = goal.title()
+            banderaDestino = verificacion(goal_verificado)
         print("----------------------------------------------------------------------------")
+        
+        if opcion_menu2 == "1":
+            # Ejecutamos el algoritmo Branch and Bound
+            tiempo_inicio = time.time()
+            path, cost = branch_and_bound_shortest_path_con_pasos(graph, start_verificado, goal_verificado, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_Breanch_and_Bound = (tiempo_fin - tiempo_inicio)
+            print("Resultado de Branch and Bound")
+            print("Camino más corto:", path)
+            print("Costo total:", cost)
+            print("La función tardó", tiempo_total_Breanch_and_Bound, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+        
+        elif opcion_menu2 == "2":
+            # Ejecutamos el algoritmo Branch and Bound
+            tiempo_inicio = time.time()
+            path, cost = branch_and_bound_shortest_path(graph, start_verificado, goal_verificado, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_Breanch_and_Bound = (tiempo_fin - tiempo_inicio)
+            print("Resultado de Branch and Bound")
+            print("Camino más corto:", path)
+            print("Costo total:", cost)
+            print("La función tardó", tiempo_total_Breanch_and_Bound, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+        
+        else:
+            print("Opción inválida, por favor seleccione una opción del 1 o 2")
+            
         
     elif opcion == "6":
-         #Ejecución del aloritmo Steepest hil climbing
-        tiempo_inicio = time.time()
-        resultado = steepest_hill_climbing(graph, start)
-        tiempo_fin = time.time()
-        tiempo_total_Steepest_Hil_Climbing = (tiempo_fin - tiempo_inicio) * 1000
-        print("El resultado de Steepest hil climbing")
-        print(resultado)
-        print("La función tardó", tiempo_total_Steepest_Hil_Climbing, "segundos en ejecutarse")
+        opcion_menu2 = menu_muestra_pasos()
+        while not banderaOrigen: #Joel Vázquez Anaya
+                start = input("Ingresa el nodo de origen: ")
+                start_verificado = start.title()
+                banderaOrigen = verificacion(start_verificado)
         print("----------------------------------------------------------------------------")
         
+        if opcion_menu2 == "1":    
+            #Ejecución del aloritmo Steepest Hil Climbing con pasos
+            tiempo_inicio = time.time()
+            resultado = steepest_hill_climbing_con_pasos(graph, start_verificado)
+            tiempo_fin = time.time()
+            tiempo_total_Steepest_Hil_Climbing = (tiempo_fin - tiempo_inicio)
+            print("El resultado de Steepest hil climbing")
+            print(resultado)
+            print("La función tardó", tiempo_total_Steepest_Hil_Climbing, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+            
+        elif opcion_menu2 == "2":
+            #Ejecución del aloritmo Steepest Hil Climbing sin pasos
+            tiempo_inicio = time.time()
+            resultado = steepest_hill_climbing(graph, start_verificado)
+            tiempo_fin = time.time()
+            tiempo_total_Steepest_Hil_Climbing = (tiempo_fin - tiempo_inicio)
+            print("El resultado de Steepest hil climbing")
+            print(resultado)
+            print("La función tardó", tiempo_total_Steepest_Hil_Climbing, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+            
+        else:
+            print("Opción inválida, por favor seleccione una opción del 1 o 2")
+        
     elif opcion == "7":
-        #Ejecución del algoritmo Stochastic hil clambing
-        tiempo_inicio = time.time()
-        resultado_stochastic = stochastic_hill_climbing(graph, start, heuristic)
-        tiempo_fin = time.time()
-        tiempo_total_Stochastic_hil_clambing = (tiempo_fin - tiempo_inicio) * 1000
-        print("El resultado de Stochastic hil clambing")
-        print(resultado_stochastic)
-        print("La función tardó", tiempo_total_Stochastic_hil_clambing, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+        opcion_menu2 = menu_muestra_pasos()
+        while not banderaOrigen: #Joel Vázquez Anaya
+            start = input("Ingresa el nodo de origen: ")
+            start_verificado = start.title()
+            banderaOrigen = verificacion(start_verificado)
+            print("----------------------------------------------------------------------------")
+                
+        if opcion_menu2 == "1": 
+            #Ejecución del algoritmo Stochastic Hil Clambing con pasos
+            tiempo_inicio = time.time()
+            resultado_stochastic = stochastic_hill_climbing_con_pasos(graph, start_verificado, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_Stochastic_hil_clambing = (tiempo_fin - tiempo_inicio)
+            print("El resultado de Stochastic hil clambing")
+            print(resultado_stochastic)
+            print("La función tardó", tiempo_total_Stochastic_hil_clambing, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+            
+        elif opcion_menu2 == "2":
+            #Ejecución del algoritmo Stochastic Hil Clambing sin pasos
+            tiempo_inicio = time.time()
+            resultado_stochastic = stochastic_hill_climbing(graph, start_verificado, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_Stochastic_hil_clambing = (tiempo_fin - tiempo_inicio)
+            print("El resultado de Stochastic hil clambing")
+            print(resultado_stochastic)
+            print("La función tardó", tiempo_total_Stochastic_hil_clambing, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+        
+        else:
+            print("Opción inválida, por favor seleccione una opción del 1 o 2")        
         
     elif opcion == "8":
         #Ejecución del algoritmo Traveling Salesman
@@ -778,7 +1407,7 @@ while opcion != "11":
         res = travelling_salesman_function(graph2,s)
         print("La ruta con menos costo es: " + str(res))
         tiempo_fin = time.time()
-        tiempo_total_Traveling_Salesman = (tiempo_fin - tiempo_inicio) * 1000
+        tiempo_total_Traveling_Salesman = (tiempo_fin - tiempo_inicio)
         print("La función tardó", tiempo_total_Traveling_Salesman, "segundos en ejecutarse")
         print("----------------------------------------------------------------------------")
 
@@ -789,153 +1418,284 @@ while opcion != "11":
         print("----------------------------------------------------------------------------")
         
     elif opcion == "9":
-        #Ejecución del algoritmo Genetic Algorithm
-        
+        opcion_menu2 = menu_muestra_pasos()
         population_size = int(input("Ingrese el tamaño de la población: "))
         num_generations = int(input("Ingrese el número de generaciones: "))
         mutation_rate = float(input("Ingrese la taza de mutación que quiere que tenga su población(La taza de mutació puede estar entre el 0 y 1): "))
-
-        tiempo_inicio = time.time()
-        Resultado_genetic = genetic_algorithm(graph, population_size, num_generations, mutation_rate)
-        tiempo_fin = time.time()
-        tiempo_total_Genetic_Algorithm = (tiempo_fin - tiempo_inicio) * 1000
-        print("El resultado de Genetic Algorithm")
-        print(Resultado_genetic)
-        print("La función tardó", tiempo_total_Genetic_Algorithm, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+        
+        if opcion_menu2 == "1":
+            #Ejecución del algoritmo Genetic Algorithm
+            tiempo_inicio = time.time()
+            Resultado_genetic = genetic_algorithm_con_pasos(graph, population_size, num_generations, mutation_rate)
+            tiempo_fin = time.time()
+            tiempo_total_Genetic_Algorithm = (tiempo_fin - tiempo_inicio)
+            print("El resultado de Genetic Algorithm")
+            print(Resultado_genetic)
+            print("La función tardó", tiempo_total_Genetic_Algorithm, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+        elif opcion_menu2 == "2":
+            #Ejecución del algoritmo Genetic Algorithm
+            tiempo_inicio = time.time()
+            Resultado_genetic = genetic_algorithm(graph, population_size, num_generations, mutation_rate)
+            tiempo_fin = time.time()
+            tiempo_total_Genetic_Algorithm = (tiempo_fin - tiempo_inicio)
+            print("El resultado de Genetic Algorithm")
+            print(Resultado_genetic)
+            print("La función tardó", tiempo_total_Genetic_Algorithm, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+        else:
+          print("----------------------------------------------------------------------------")  
+            
     elif opcion == "10":
-        # Ejecutamos el algoritmo Greedy
-        tiempo_inicio = time.time()
-        path = greedy(graph, 'A', 'F')
-        if path is not None:
+        opcion_menu2 = menu_muestra_pasos()
+        if opcion_menu2 == "1":
+            # Ejecutamos el algoritmo Greedy
+                tiempo_inicio = time.time()
+                path = greedy_con_pasos(graph, start_verificado, goal_verificado)
+                if path is not None:
+                    tiempo_fin = time.time()
+                    tiempo_total_Greedy = (tiempo_fin - tiempo_inicio)
+                    print("Resultado Greedy")
+                    print(f"El camino más corto desde '{start_verificado}' hasta '{goal_verificado}' es: {path}")
+                    print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
+                else:
+                    tiempo_fin = time.time()
+                    tiempo_total_Greedy = (tiempo_fin - tiempo_inicio)
+                    print(f"No se pudo encontrar un camino válido desde '{start_verificado}' hasta '{goal_verificado}'.")
+                    print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
+                print("")
+                
+                # Ejecutamos el algoritmo A* con peso
+                tiempo_inicio = time.time()
+                path = weighted_astar_con_pasos(start_verificado, goal_verificado, heuristic, successors, edge_cost, w=1.5)
+                tiempo_fin = time.time()
+                tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)
+                print("Resultado weighted A*")
+                print(path)
+                print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
+                
+                # Ejecutamos el algoritmo A*
+                tiempo_inicio = time.time()
+                came_from, cost_so_far = astar_con_pasos(start_verificado, goal_verificado, graph, heuristic)
+                tiempo_fin = time.time()
+                tiempo_total_A = (tiempo_fin - tiempo_inicio)
+                # Mostramos el resultado
+                if goal not in came_from:
+                    print(f"No se encontró un camino desde {start_verificado} hasta {goal_verificado}")
+                    opcion_menu2 = "0"
+                else:
+                # Reconstruimos el camino desde el nodo inicial al nodo objetivo utilizando el diccionario de nodos antecesores
+                    path = [goal]
+                    node = goal
+                    while node != start:
+                        node = came_from[node]
+                        path.append(node)
+                    path.reverse()
+                # Imprimimos el camino y el costo total
+                    print("Resultado A*")
+                    print(" -> ".join(node for node in path))
+                    print(f"Costo total: {cost_so_far[goal]}")
+                    print("La función tardó", tiempo_total_A, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
+                
+                # Ejecutamos el algoritmo Beam
+                tiempo_inicio = time.time()
+                result = beam_search_con_pasos(start_verificado, lambda n: n == goal_verificado, expand_fn, beam_width, goal, heuristic)
+                tiempo_fin = time.time()
+                tiempo_total_Beam = (tiempo_fin - tiempo_inicio)
+                print("Resultado Beam")
+                print(result)
+                print("La función tardó", tiempo_total_Beam, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
+                
+                 # Ejecutamos el algoritmo Branch and Bound
+                tiempo_inicio = time.time()
+                path, cost = branch_and_bound_shortest_path_con_pasos(graph, start_verificado, goal_verificado, heuristic)
+                tiempo_fin = time.time()
+                tiempo_total_Breanch_and_Bound = (tiempo_fin - tiempo_inicio)
+                print("Resultado de Branch and Bound")
+                print("Camino más corto:", path)
+                print("Costo total:", cost)
+                print("La función tardó", tiempo_total_Breanch_and_Bound, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
+                
+                #Ejecución del aloritmo Steepest Hil Climbing con pasos
+                tiempo_inicio = time.time()
+                resultado = steepest_hill_climbing_con_pasos(graph, start_verificado)
+                tiempo_fin = time.time()
+                tiempo_total_Steepest_Hil_Climbing = (tiempo_fin - tiempo_inicio)
+                print("El resultado de Steepest hil climbing")
+                print(resultado)
+                print("La función tardó", tiempo_total_Steepest_Hil_Climbing, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
+                
+                #Ejecución del algoritmo Stochastic Hil Clambing con pasos
+                tiempo_inicio = time.time()
+                resultado_stochastic = stochastic_hill_climbing_con_pasos(graph, start_verificado, heuristic)
+                tiempo_fin = time.time()
+                tiempo_total_Stochastic_hil_clambing = (tiempo_fin - tiempo_inicio)
+                print("El resultado de Stochastic hil clambing")
+                print(resultado_stochastic)
+                print("La función tardó", tiempo_total_Stochastic_hil_clambing, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
+                
+                #Agregar código de Cisco
+                
+                #Ejecución del algoritmo Genetic Algorithm
+                tiempo_inicio = time.time()
+                Resultado_genetic = genetic_algorithm_con_pasos(graph, population_size, num_generations, mutation_rate)
+                tiempo_fin = time.time()
+                tiempo_total_Genetic_Algorithm = (tiempo_fin - tiempo_inicio)
+                print("El resultado de Genetic Algorithm")
+                print(Resultado_genetic)
+                print("La función tardó", tiempo_total_Genetic_Algorithm, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
+                
+                opcion_menu2 == "0"
+            
+        elif opcion_menu2 == "2":
+            while not banderaOrigen: #Joel Vázquez Anaya
+                    start = input("Ingresa el nodo de origen: ")
+                    start_verificado = start.title()
+                    banderaOrigen = verificacion(start_verificado)
+
+            while not banderaDestino: #Joel Vázquez Anaya
+                goal = input("Ingresa el nodo de destino: ")
+                goal_verificado = goal.title()
+                banderaDestino = verificacion(goal_verificado)
+                
+            # Ejecutamos el algoritmo Greedy
+            tiempo_inicio = time.time()
+            path = greedy(graph, start_verificado, goal_verificado)
+            if path is not None:
+                tiempo_fin = time.time()
+                tiempo_total_Greedy = (tiempo_fin - tiempo_inicio)
+                print("Resultado Greedy")
+                print(f"El camino más corto desde '{start_verificado}' hasta '{goal_verificado}' es: {path}")
+                print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
+            else:
+                tiempo_fin = time.time()
+                tiempo_total_Greedy = (tiempo_fin - tiempo_inicio)
+                print(f"No se pudo encontrar un camino válido desde '{start_verificado}' hasta '{goal_verificado}'.")
+                print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+
+            # Ejecutamos el algoritmo A* con peso
+            tiempo_inicio = time.time()
+            path = weighted_astar(start_verificado, goal_verificado, heuristic, successors, edge_cost, w=1.5)
             tiempo_fin = time.time()
-            tiempo_total_Greedy = (tiempo_fin - tiempo_inicio) * 1000
-            print("Resultado Greedy")
-            print(f"El camino más corto desde '{start}' hasta '{goal}' es: {path}")
-            print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
-        else:
+            tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)
+            print("Resultado weighted A*")
+            print(path)
+            print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+
+
+            # Ejecutamos el algoritmo A*
+            tiempo_inicio = time.time()
+            came_from, cost_so_far = astar(start_verificado, goal_verificado, graph, heuristic)
             tiempo_fin = time.time()
-            tiempo_total_Greedy = (tiempo_fin - tiempo_inicio) * 1000
-            print(f"No se pudo encontrar un camino válido desde '{start}' hasta '{goal}'.")
-            print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+            tiempo_total_A = (tiempo_fin - tiempo_inicio)
+            # Mostramos el resultado
+            if goal not in came_from:
+                print(f"No se encontró un camino desde {start_verificado} hasta {goal_verificado}")
+            else:
+            # Reconstruimos el camino desde el nodo inicial al nodo objetivo utilizando el diccionario de nodos antecesores
+                path = [goal]
+                node = goal
+                while node != start_verificado:
+                    node = came_from[node]
+                    path.append(node)
+                path.reverse()
+            # Imprimimos el camino y el costo total
+                print("Resultado A*")
+                print(" -> ".join(node for node in path))
+                print(f"Costo total: {cost_so_far[goal]}")
+                print("La función tardó", tiempo_total_A, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
 
-        # Ejecutamos el algoritmo A* con peso
-        tiempo_inicio = time.time()
-        path = weighted_astar(start, goal, heuristic, successors, edge_cost, w=1.5)
-        tiempo_fin = time.time()
-        tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)*1000
-        print("Resultado weighted A*")
-        print(path)
-        print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+            # Ejecutamos el algoritmo Beam
+            tiempo_inicio = time.time()
+            result = beam_search(start_verificado, lambda n: n == goal_verificado, expand_fn, beam_width, goal_verificado, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_Beam = (tiempo_fin - tiempo_inicio)
+            print("Resultado Beam")
+            print(result)
+            print("La función tardó", tiempo_total_Beam, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
 
+            # Ejecutamos el algoritmo Branch and Bound
+            tiempo_inicio = time.time()
+            path, cost = branch_and_bound_shortest_path(graph, start_verificado, goal_verificado, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_Breanch_and_Bound = (tiempo_fin - tiempo_inicio)
+            print("Resultado de Branch and Bound")
+            print("Camino más corto:", path)
+            print("Costo total:", cost)
+            print("La función tardó", tiempo_total_Breanch_and_Bound, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
 
-        # Ejecutamos el algoritmo A*
-        tiempo_inicio = time.time()
-        came_from, cost_so_far = astar(start, goal, graph, heuristic)
-        tiempo_fin = time.time()
-        tiempo_total_A = (tiempo_fin - tiempo_inicio) * 1000
-        # Mostramos el resultado
-        if goal not in came_from:
-            print(f"No se encontró un camino desde {start} hasta {goal}")
-        else:
-        # Reconstruimos el camino desde el nodo inicial al nodo objetivo utilizando el diccionario de nodos antecesores
-            path = [goal]
-            node = goal
-            while node != start:
-                node = came_from[node]
-                path.append(node)
-            path.reverse()
-        # Imprimimos el camino y el costo total
-            print("Resultado A*")
-            print(" -> ".join(node for node in path))
-            print(f"Costo total: {cost_so_far[goal]}")
-            print("La función tardó", tiempo_total_A, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+            #Ejecución del aloritmo Steepest hil climbing
+            tiempo_inicio = time.time()
+            resultado = steepest_hill_climbing(graph, start_verificado)
+            tiempo_fin = time.time()
+            tiempo_total_Steepest_Hil_Climbing = (tiempo_fin - tiempo_inicio)
+            print("El resultado de steepest hil climbing")
+            print(resultado)
+            print("La función tardó", tiempo_total_Steepest_Hil_Climbing, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
 
-        # Ejecutamos el algoritmo Beam
-        tiempo_inicio = time.time()
-        result = beam_search(start, lambda n: n == goal, expand_fn, beam_width, goal, heuristic)
-        tiempo_fin = time.time()
-        tiempo_total_Beam = (tiempo_fin - tiempo_inicio) * 1000
-        print("Resultado Beam")
-        print(result)
-        print("La función tardó", tiempo_total_Beam, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+            #Ejecución del algoritmo Stochastic hil clambing
+            tiempo_inicio = time.time()
+            resultado_stochastic = stochastic_hill_climbing(graph, start_verificado, heuristic)
+            tiempo_fin = time.time()
+            tiempo_total_Stochastic_hil_clambing = (tiempo_fin - tiempo_inicio)
+            print("El resultado de Stochastic hil clambing")
+            print(resultado_stochastic)
+            print("La función tardó", tiempo_total_Stochastic_hil_clambing, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
 
-        # Ejecutamos el algoritmo Branch and Bound
-        tiempo_inicio = time.time()
-        path, cost = branch_and_bound_shortest_path(graph, start, goal, heuristic)
-        tiempo_fin = time.time()
-        tiempo_total_Breanch_and_Bound = (tiempo_fin - tiempo_inicio) * 1000
-        print("Resultado de Branch and Bound")
-        print("Camino más corto:", path)
-        print("Costo total:", cost)
-        print("La función tardó", tiempo_total_Breanch_and_Bound, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+            #Ejecución del algoritmo Traveling Salesman
+            graph2 = [[0,80,99,1000,1000,1000],[88,0,1000,146,97,1000],[99,1000,0,0,1000,211],[1000,146,0,0,138,1000],[1000,97,1000,138,0,101],[1000,1000,211,1000,101,0]]
+            s = 0
+            tiempo_inicio = time.time()
+            res = travelling_salesman_function(graph2,s)
+            print("La ruta con menos costo es: " + str(res))
+            tiempo_fin = time.time()
+            tiempo_total_Traveling_Salesman = (tiempo_fin - tiempo_inicio)
+            print("La función tardó", tiempo_total_Traveling_Salesman, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
 
-        #Ejecución del aloritmo Steepest hil climbing
-        tiempo_inicio = time.time()
-        resultado = steepest_hill_climbing(graph, start)
-        tiempo_fin = time.time()
-        tiempo_total_Steepest_Hil_Climbing = (tiempo_fin - tiempo_inicio) * 1000
-        print("El resultado de steepest hil climbing")
-        print(resultado)
-        print("La función tardó", tiempo_total_Steepest_Hil_Climbing, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+            #Ejecución del algoritmo para generar la imagen del grafo
+            print("----------------------------------------------------------------------------")
+            print(G.nodes())
+            print(G.edges())
+            print_graph(G)
 
-        #Ejecución del algoritmo Stochastic hil clambing
-        tiempo_inicio = time.time()
-        resultado_stochastic = stochastic_hill_climbing(graph, start, heuristic)
-        tiempo_fin = time.time()
-        tiempo_total_Stochastic_hil_clambing = (tiempo_fin - tiempo_inicio) * 1000
-        print("El resultado de Stochastic hil clambing")
-        print(resultado_stochastic)
-        print("La función tardó", tiempo_total_Stochastic_hil_clambing, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+            #Ejecución del algoritmo Genetic Algorithm
+            population_size = int(print("Ingrese el tamaño de la población: "))
+            num_generations = int(print("Ingrese el número de generaciones: "))
+            mutation_rate = float(print("Ingrese la taza de mutación que quiere que tenga su población: "))
 
-        #Ejecución del algoritmo Traveling Salesman
-        graph2 = [[0,80,99,1000,1000,1000],[88,0,1000,146,97,1000],[99,1000,0,0,1000,211],[1000,146,0,0,138,1000],[1000,97,1000,138,0,101],[1000,1000,211,1000,101,0]]
-        s = 0
-        tiempo_inicio = time.time()
-        res = travelling_salesman_function(graph2,s)
-        print("La ruta con menos costo es: " + str(res))
-        tiempo_fin = time.time()
-        tiempo_total_Traveling_Salesman = (tiempo_fin - tiempo_inicio) * 1000
-        print("La función tardó", tiempo_total_Traveling_Salesman, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
-
-        #Ejecución del algoritmo para generar la imagen del grafo
-        print("----------------------------------------------------------------------------")
-        print(G.nodes())
-        print(G.edges())
-        print_graph(G)
-
-        #Ejecución del algoritmo Genetic Algorithm
-        population_size = int(print("Ingrese el tamaño de la población: "))
-        num_generations = int(print("Ingrese el número de generaciones: "))
-        mutation_rate = float(print("Ingrese la taza de mutación que quiere que tenga su población: "))
-
-        tiempo_inicio = time.time()
-        Resultado_genetic = genetic_algorithm(graph, population_size, num_generations, mutation_rate)
-        tiempo_fin = time.time()
-        tiempo_total_Genetic_Algorithm = (tiempo_fin - tiempo_inicio) * 1000
-        print("El resultado de Genetic Algorithm")
-        print(Resultado_genetic)
-        print("La función tardó", tiempo_total_Genetic_Algorithm, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
-       
+            tiempo_inicio = time.time()
+            Resultado_genetic = genetic_algorithm(graph, population_size, num_generations, mutation_rate)
+            tiempo_fin = time.time()
+            tiempo_total_Genetic_Algorithm = (tiempo_fin - tiempo_inicio)
+            print("El resultado de Genetic Algorithm")
+            print(Resultado_genetic)
+            print("La función tardó", tiempo_total_Genetic_Algorithm, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+            
+            opcion_menu2 == "0"
+        
     elif opcion == "11":
-        print("Saliendo del programa...")
-        break
+        sys.exit("Gracias por usar nuestro algoritmo, ponganos 10 profe :)")
     
     else:
         print("Opción inválida, por favor seleccione una opción del 1 al 11")
         
-print("")
-print("El timepo de ejecución que se muestra en las funciones es en milisegundos")
-print("----------------------------------------------------------------------------")
 print("")
 
 menu()

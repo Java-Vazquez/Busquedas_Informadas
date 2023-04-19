@@ -1681,12 +1681,17 @@ while opcion != "11":
             # Ejecutamos el algoritmo A* con peso
             tiempo_inicio = time.time()
             path = weighted_astar(start_verificado, goal_verificado, heuristic, successors, edge_cost, w=1.5)
-            tiempo_fin = time.time()
-            tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)
-            print("Resultado weighted A*")
-            print(path)
-            print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
-            print("----------------------------------------------------------------------------")
+
+            # Ejecutamos el algoritmo Greedy
+            tiempo_inicio = time.time()
+            path = greedy(graph, start, goal)
+            if path is not None:
+                tiempo_fin = time.time()
+                tiempo_total_A_pesos = (tiempo_fin - tiempo_inicio)
+                print("Resultado weighted A*")
+                print(path)
+                print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
+                print("----------------------------------------------------------------------------")
 
 
             # Ejecutamos el algoritmo A*
@@ -1789,7 +1794,7 @@ while opcion != "11":
     elif opcion == "11":
         sys.exit("Gracias por usar nuestro algoritmo, ponganos 10 profe :)")
     
-    else:
+else:
         print("Opción inválida, por favor seleccione una opción del 1 al 11")
         
 print("")

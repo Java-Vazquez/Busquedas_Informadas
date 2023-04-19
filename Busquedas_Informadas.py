@@ -1179,6 +1179,7 @@ def menu():#Joel Vázquez Anaya
     print("")
     return opcion
 
+beam_width = 3
 opcion = None
 opcion_menu2 = None
 banderaOrigen = False

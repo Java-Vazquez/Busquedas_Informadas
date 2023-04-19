@@ -13,22 +13,24 @@ import time
 import sys
 
 #Infromación General
+print("")
+print("Búsquedas Informadas")
+print("")
+print("Universidad Panamericana")
+print("")
+print("Inteligencia Artificial")
+print("")
+print("Integrantes:")
+print("-Anaya Viveros Francisco (0181879)")
+print("-Vázquez Anaya Joel (0201031)")
+print("-Vázquez Gurrola Javier (0215391)")
+print("")
+print("Fecha de entrega 26/04/2023")
+print("")
+print("Versión 1.7")
+print("")
+
 """
-Búsquedas Informadas
-
-Universidad Panamericana
-
-Inteligencia Artificial
-
-Integrantes:
--Anaya Viveros Francisco (0181879)
--Vázquez Anaya Joel (0201031)
--Vázquez Gurrola Javier (0215391)
-
-Fecha de entrega 26/04/2023
-
-Versión 1.7
-
 El objetivo del código es poder generar búsquedas de maneras informadas comenzando creando una 
 heurística, utilizando la fórmula Haversine. Después iniciamos con la búsqueda greedy, tenemos
 un algoritmo A* con peso, después el A*, se reconstruye el camino entre los nodos que digamos
@@ -108,6 +110,15 @@ def heuristic(node): #Javier Vázquez Gurrola
 # Función para Greedy best-first
 def get_neighbors(node): #Javier Vázquez Gurrola 
     return graph[node].keys()
+
+#Fúnción para imprimir el grafo procesado
+#Muestra el grafo
+def imprimir(grafo):#Javier Vázquez Gurrola 
+	print("Grafo utilizado: \n")
+	for key, lista in grafo.items():
+		print(key)
+		print(lista)
+print("--------------------------------")
 
 """
 La función greedy realiza una búsqueda Greedy Best-First para encontrar el camino más corto desde el nodo "start" hasta el nodo "goal". 
@@ -1175,7 +1186,8 @@ def menu():#Joel Vázquez Anaya
     print("8.  Traveling Salesman")
     print("9.  Genetic Algorithm")
     print("10. Todos los anteriores")
-    print("11. Salir del programa")
+    print("11. Mostrar grafo procesado")
+    print("12. Salir del programa")
     print("---------------------------------------------------------")
     print("")
     opcion = input("Ingrese el número de la opción que desea: ")
@@ -1188,7 +1200,7 @@ opcion_menu2 = None
 banderaOrigen = False
 banderaDestino = False
 
-while opcion != "11":
+while opcion != "12":
     opcion = menu()
     if opcion == "1":
         while opcion_menu2 != "1":
@@ -1805,10 +1817,12 @@ while opcion != "11":
             opcion_menu2 == "0"
         
     elif opcion == "11":
-        sys.exit("Gracias por usar nuestro algoritmo, ponganos 10 profe :)")
+        imprimir(graph)
+        print("")
+        
+    elif opcion == "12":
+        sys.exit("Gracias por usar nuestro algoritmo, pónganos 10 profe :)")
     
 else:
         print("Opción inválida, por favor seleccione una opción del 1 al 11")
-        
-print("")
-
+        print("")

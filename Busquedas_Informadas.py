@@ -180,14 +180,12 @@ def greedy(graph, start, goal): #Javier Vázquez Gurrola
     while not frontier.empty():
         current = frontier.get()
         if current == goal:
-            print(explored)
             break
         explored.add(current)
         for neighbor in graph[current]:
             if neighbor not in explored:
                 priority = heuristic(neighbor)
                 frontier.put(neighbor, priority)
-                print(frontier)
         return explored
 """
 La función edge_cost toma una tupla de dos nodos y devuelve el costo de la arista que los conecta en el grafo.
@@ -861,7 +859,18 @@ def genetic_algorithm_con_pasos(graph, population_size, num_generations, mutatio
     best_chromosome = max(population, key=lambda chromosome: fitness_function(chromosome, graph))
     return best_chromosome
 
-#Función Genetic Algorithm
+#Función Genetic Algorithm con pasos
+def genetic_algorithm_con_pasos(graph, population_size, num_generations, mutation_rate):# Joel Vázquez Anaya
+    population = generate_initial_population_con_pasos(population_size, graph)
+    for generation in range(num_generations):
+        fitness_scores = [fitness_function_con_pasos(chromosome, graph) for chromosome in population]
+        parent1 , parent2 = select_parents_con_pasos(population)
+        offspring = generate_offspring_con_pasos(parent1 , parent2)
+        population = mutate_population_con_pasos(offspring, mutation_rate,graph)
+    best_chromosome = max(population, key=lambda chromosome: fitness_function_con_pasos(chromosome, graph))
+    return best_chromosome
+
+#Función Genetic Algorithm sin pasos
 def genetic_algorithm(graph, population_size, num_generations, mutation_rate):# Joel Vázquez Anaya
     population = generate_initial_population(population_size, graph)
     for generation in range(num_generations):
@@ -872,6 +881,7 @@ def genetic_algorithm(graph, population_size, num_generations, mutation_rate):# 
     best_chromosome = max(population, key=lambda chromosome: fitness_function(chromosome, graph))
     return best_chromosome
 
+
 """
 Función generate_initial_population para realizar el algoritmo de Genetic Algorithm
 Lo que hace esta función es generar una población de manera aleatoria, esta población es 
@@ -880,7 +890,7 @@ esta función toma cada nodo del grafo y los coloca de modo de un directorio par
 mejor solución al problema
  
 """
-def generate_initial_population(population_size, graph): #Joel Vázquez Anaya
+def generate_initial_population_con_pasos(population_size, graph): #Joel Vázquez Anaya
     population = []
     nodes = list(graph.keys())
     for i in range(population_size):
@@ -892,6 +902,14 @@ def generate_initial_population(population_size, graph): #Joel Vázquez Anaya
         print("")
     return population
 
+def generate_initial_population(population_size, graph): #Joel Vázquez Anaya
+    population = []
+    nodes = list(graph.keys())
+    for i in range(population_size):
+        chromosome = random.sample(nodes, len(nodes))
+        population.append(chromosome)
+    return population
+
 """
 Función de fitness_function para realizar el algoritmo de Genetic Algorithm
 Esta función hace la implemnetación de ver que tanta aplitud tiene cada nodo
@@ -899,7 +917,7 @@ esto quiere decir que ve cuantos vecinos tiene cada uno de los nodos que se ecnu
 en el cromosoma, se busca maximizar los vecinos que son soluciones en el cromosoma
 
 """
-def fitness_function(chromosome, graph): #Joel Vázquez Anaya
+def fitness_function_con_pasos(chromosome, graph): #Joel Vázquez Anaya
     fitness = 0
     print("Vemos la cantidad de vecinos que tiene el nodo")
     for node in graph:
@@ -912,6 +930,15 @@ def fitness_function(chromosome, graph): #Joel Vázquez Anaya
                 print("")
     return fitness
 
+def fitness_function(chromosome, graph): #Joel Vázquez Anaya
+    fitness = 0
+    for node in graph:
+        for neighbor in graph[node]:
+            if neighbor in chromosome:
+                fitness += 1
+    return fitness
+
+
 """
 
 Función select_parents para realizar el algoritmo de Genetic Algorithm
@@ -922,7 +949,7 @@ ese lo toma como padre y este procedimiento lo hace 2 veces para tener los 2 pad
 agrega a la lista de mejores andidatos la cual se guarda en padres
 
 """
-def select_parents(population): #Joel Vázquez Anaya
+def select_parents_con_pasos(population): #Joel Vázquez Anaya
     print("Realizamos la cruza de dos padres de manera aleatoria")
     print("Se hace de ña siguiente manera: ")
     print("Toma un candidato y lo que hace es que selecciona un nodo de manera aleatoria para poder")
@@ -946,6 +973,14 @@ def select_parents(population): #Joel Vázquez Anaya
     print("")
     return parent1, parent2
 
+
+def select_parents(population): #Joel Vázquez Anaya
+    parent1 = random.choice(population)
+    parent2 = random.choice(population)
+    while parent2 == parent1 and len(population) > 1:
+        parent2 = random.choice(population)
+    return parent1, parent2
+
 """
 
 Función generate_offspring para realizar el algoritmo de Genetic Algorithm
@@ -960,7 +995,7 @@ padre con la segunda parte del segundo padre a partir del punto de cruce para
 formar el descendiente.
 
 """
-def generate_offspring(parent1, parent2): #Joel Vázquez Anaya
+def generate_offspring_con_pasos(parent1, parent2): #Joel Vázquez Anaya
     print("Hacemos a partir de los 2 padres crea una desendencia lo hace a partir de una de las partes de cada uno de los padres")
     if len(parent1) <= 1:  # verificación de longitud de parent1
         return parent1
@@ -973,6 +1008,14 @@ def generate_offspring(parent1, parent2): #Joel Vázquez Anaya
     """if random.random() < mutation_rate:
         print("Llamamos a la función de mutación de la población")
         mutate_population(child)"""
+    return 
+
+def generate_offspring(parent1, parent2): #Joel Vázquez Anaya
+    if len(parent1) <= 1:  # verificación de longitud de parent1
+        return parent1
+    crossover_point = random.randrange(1, len(parent1))
+    child = parent1[:crossover_point] + parent2[crossover_point:]
+
     return child
 
 
@@ -989,7 +1032,7 @@ del grafo, el cromosoma mutado se agrega a una lista de cromosomas mutados, que 
 final de la función.
  
 """
-def mutate_population(population, mutation_rate, graph): #Joel Vázquez Anaya
+def mutate_population_con_pasos(population, mutation_rate, graph): #Joel Vázquez Anaya
     print("Generar una mutación en los cromosomas, esto lo hace tomando de forma aleatoria un nodo del cromosoma para poder realizar la mutación")
     print("Esto se hace con las siguientes reglas: ")
     print("Si un número aleatorio generado al azar es menor o igual a la tasa de mutación (mutation_rate), se realiza la mutación")
@@ -1009,6 +1052,19 @@ def mutate_population(population, mutation_rate, graph): #Joel Vázquez Anaya
     print("Lista de cromosomas mutados: ", mutated_population)
     
     return mutated_population
+
+def mutate_population(population, mutation_rate, graph): #Joel Vázquez Anaya
+    mutated_population = []
+    for chromosome in population:
+        mutated_chromosome = list(chromosome)
+        for i in range(len(chromosome)):
+            if random.random() < mutation_rate:
+                mutated_chromosome[i] = random.choice(list(graph.keys()))
+                print(mutated_chromosome[i])
+        mutated_population.append(mutated_chromosome)
+    
+    return mutated_population
+
 
 def verificacion(nodo): #Javier Vázquez Gurrola 
   bandera = False
@@ -1235,6 +1291,7 @@ while opcion != "12":
                 banderaOrigen = False
                 banderaDestino = False
                 break
+                
             elif opcion_menu2 == "2":
                 # Ejecutamos el algoritmo Greedy
                 tiempo_inicio = time.time()
@@ -1255,6 +1312,7 @@ while opcion != "12":
                 banderaOrigen = False
                 banderaDestino = False
                 break
+                
             else:
                 print("Opción inválida, por favor seleccione una opción del 1 o 2")
                 
@@ -1287,7 +1345,7 @@ while opcion != "12":
             banderaOrigen = False
             banderaDestino = False
             break
-        
+            
         elif opcion_menu2 == "2":
             # Ejecutamos el algoritmo A* con peso
             tiempo_inicio = time.time()
@@ -1302,7 +1360,7 @@ while opcion != "12":
             banderaOrigen = False
             banderaDestino = False
             break
-        
+            
         else:
             print("Opción inválida, por favor seleccione una opción del 1 o 2")
 

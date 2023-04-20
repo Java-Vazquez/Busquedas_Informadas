@@ -27,7 +27,7 @@ print("-Vázquez Gurrola Javier (0215391)")
 print("")
 print("Fecha de entrega 26/04/2023")
 print("")
-print("Versión 1.7")
+print("Versión 1.9")
 print("")
 
 """

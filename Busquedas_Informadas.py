@@ -1014,7 +1014,7 @@ def verificacion(nodo): #Javier Vázquez Gurrola
   bandera = False
   todos_los_nodos = ['Cabo San Lucas','La Paz','Santo Domingo','Santa Rosalia','Santa Quintin','Ensenada','San Felipe','Tijuana','Mexicalli','Santa Ana','Agua Prieta','Hermosillo','Janos','Guaymas','Ciudad Obregon','Chihuahua','Juarez','Topolobampo','Hidalgo del Parral','Culiacan','Mazatlan','Tepic','Ojinaga','Monclava','Torreon','Piedras Negras','Nuevo Laredo','Reynosa','Matamoros','Ciudad Victoria','Soto la Marina','Monterrey','Durango','Zacatecas','San Luis Potosi','Aguascalientes','Guanajuato','Guadalajara','Manzanillo','Colima','Salamanca','Atlacomulco','Queretaro','Tlaxcala','Tampico','Tuxpan de Rodiguez Cano','Pachuca de Soto','Playa Azul','Zihuatanejo','Ciudad Altamirano','Iguala','Chilpancingo','Acapulco','Pinotepa Nacional','Puerto Angel','Oaxaca','Cdmx','Cuernavaca','Puebla','Vercruz','Cordoba','Izucar de Matamoros','Tehuacan','Oaxaca','Alvarado','Acayucan','Tehuantepec','Tuxtla','Villa Hermosa','Ciudad del Carmen','Campeche','Merida','Francisco Escarcega','Chetumal','Felipe Carrillo Puerto','Valladolid','Cancún']
   #todos_los_nodos = ['A', 'B', 'C', 'D', 'E', 'F']
-  #for elemento in todos_los_nodos:
+  #for elemento en todos_los_nodos:
   if nodo in todos_los_nodos: 
         print("El elemento", nodo, "está en la lista, puede continuar...\n") 
         bandera = True
@@ -1231,7 +1231,9 @@ while opcion != "12":
                     print(f"No se pudo encontrar un camino válido desde '{start_verificado}' hasta '{goal_verificado}'.")
                     print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
                 print("----------------------------------------------------------------------------")
-                
+                opcion_menu2 = "0"
+                banderaOrigen = False
+                banderaDestino = False
                 break
             elif opcion_menu2 == "2":
                 # Ejecutamos el algoritmo Greedy
@@ -1249,13 +1251,17 @@ while opcion != "12":
                     print(f"No se pudo encontrar un camino válido desde '{start_verificado}' hasta '{goal_verificado}'.")
                     print("La función tardó", tiempo_total_Greedy, "segundos en ejecutarse")
                 print("----------------------------------------------------------------------------")
-                
+                opcion_menu2 = "0"
+                banderaOrigen = False
+                banderaDestino = False
                 break
             else:
                 print("Opción inválida, por favor seleccione una opción del 1 o 2")
                 
     elif opcion == "2":
         opcion_menu2 = menu_muestra_pasos()
+        banderaOrigen = False
+        banderaDestino = False
         while not banderaOrigen: #Joel Vázquez Anaya
                 start = input("Ingresa el nodo de origen: ")
                 start_verificado = start.title()
@@ -1277,7 +1283,9 @@ while opcion != "12":
             print(path)
             print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
-            
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
             break
         
         elif opcion_menu2 == "2":
@@ -1290,7 +1298,9 @@ while opcion != "12":
             print(path)
             print("La función tardó", tiempo_total_A_pesos, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
-            
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
             break
         
         else:
@@ -1333,7 +1343,9 @@ while opcion != "12":
                 print(f"Costo total: {cost_so_far[goal]}")
                 print("La función tardó", tiempo_total_A, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
-            
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
             break
             
         elif opcion_menu2 == "2":
@@ -1360,7 +1372,9 @@ while opcion != "12":
                 print(f"Costo total: {cost_so_far[goal]}")
                 print("La función tardó", tiempo_total_A, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
-            
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
             break
             
         else:
@@ -1390,6 +1404,9 @@ while opcion != "12":
             print(result)
             print("La función tardó", tiempo_total_Beam, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
             
         elif opcion_menu2 == "2":
             # Ejecutamos el algoritmo Beam
@@ -1401,6 +1418,9 @@ while opcion != "12":
             print(result)
             print("La función tardó", tiempo_total_Beam, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
             
         else:
             print("Opción inválida, por favor seleccione una opción del 1 o 2")
@@ -1429,6 +1449,9 @@ while opcion != "12":
             print("Costo total:", cost)
             print("La función tardó", tiempo_total_Breanch_and_Bound, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
         
         elif opcion_menu2 == "2":
             # Ejecutamos el algoritmo Branch and Bound
@@ -1441,6 +1464,9 @@ while opcion != "12":
             print("Costo total:", cost)
             print("La función tardó", tiempo_total_Breanch_and_Bound, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
         
         else:
             print("Opción inválida, por favor seleccione una opción del 1 o 2")
@@ -1464,6 +1490,9 @@ while opcion != "12":
             print(resultado)
             print("La función tardó", tiempo_total_Steepest_Hil_Climbing, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
             
         elif opcion_menu2 == "2":
             #Ejecución del aloritmo Steepest Hil Climbing sin pasos
@@ -1475,6 +1504,9 @@ while opcion != "12":
             print(resultado)
             print("La función tardó", tiempo_total_Steepest_Hil_Climbing, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
             
         else:
             print("Opción inválida, por favor seleccione una opción del 1 o 2")
@@ -1497,6 +1529,9 @@ while opcion != "12":
             print(resultado_stochastic)
             print("La función tardó", tiempo_total_Stochastic_hil_clambing, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            banderaOrigen = False
+                
             
         elif opcion_menu2 == "2":
             #Ejecución del algoritmo Stochastic Hil Clambing sin pasos
@@ -1508,6 +1543,9 @@ while opcion != "12":
             print(resultado_stochastic)
             print("La función tardó", tiempo_total_Stochastic_hil_clambing, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
+            banderaOrigen = False
+                
         
         else:
             print("Opción inválida, por favor seleccione una opción del 1 o 2")        
@@ -1546,6 +1584,7 @@ while opcion != "12":
             print(Resultado_genetic)
             print("La función tardó", tiempo_total_Genetic_Algorithm, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
         elif opcion_menu2 == "2":
             #Ejecución del algoritmo Genetic Algorithm
             tiempo_inicio = time.time()
@@ -1556,6 +1595,7 @@ while opcion != "12":
             print(Resultado_genetic)
             print("La función tardó", tiempo_total_Genetic_Algorithm, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
+            opcion_menu2 = "0"
         else:
           print("----------------------------------------------------------------------------")  
             
@@ -1691,7 +1731,9 @@ while opcion != "12":
                 print("La función tardó", tiempo_total_Genetic_Algorithm, "segundos en ejecutarse")
                 print("----------------------------------------------------------------------------")
                 
-                opcion_menu2 == "0"
+                opcion_menu2 = "0"
+                banderaOrigen = False
+                banderaDestino = False
             
         elif opcion_menu2 == "2":
             while not banderaOrigen: #Joel Vázquez Anaya
@@ -1814,7 +1856,9 @@ while opcion != "12":
             print("La función tardó", tiempo_total_Genetic_Algorithm, "segundos en ejecutarse")
             print("----------------------------------------------------------------------------")
             
-            opcion_menu2 == "0"
+            opcion_menu2 = "0"
+            banderaOrigen = False
+            banderaDestino = False
         
     elif opcion == "11":
         imprimir(graph)

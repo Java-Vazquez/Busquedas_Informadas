@@ -121,72 +121,117 @@ def imprimir(grafo):#Javier Vázquez Gurrola
 print("--------------------------------")
 
 """
-La función greedy realiza una búsqueda Greedy Best-First para encontrar el camino más corto desde el nodo "start" hasta el nodo "goal". 
-El código es una implementación del algoritmo de búsqueda Greedy best-first search que utiliza una cola de prioridad para explorar 
-los nodos en un orden determinado por una heurística. 
-Se inicializa una cola de prioridad "frontier" y un conjunto de nodos explorados "explored".
-El nodo de inicio se inserta en la cola de prioridad con una prioridad de 0.
-Se comienza a iterar mientras la cola de prioridad no esté vacía.
-Se extrae el primer elemento de la cola de prioridad, que es el nodo con la menor prioridad, y se almacena en la variable current.
-Si el nodo actual es el nodo objetivo, se imprime el conjunto de nodos explorados y se rompe el ciclo.
-El nodo actual se agrega al conjunto de nodos explorados.
-Se exploran todos los vecinos del nodo actual. Si un vecino no ha sido explorado previamente, se calcula su prioridad mediante la heurística
-y se inserta en la cola de prioridad.
-Al final del ciclo, se devuelve el conjunto de nodos explorados.
-La heurística utilizada en el código es la función "heuristic", que toma un nodo y devuelve la distancia Haversine entre ese nodo y el nodo objetivo.
+La función greedy implementa el algoritmo de búsqueda Greedy Best First Search para encontrar el camino más corto entre un nodo de inicio 
+y un nodo objetivo en un grafo. El algoritmo utiliza una función heurística para estimar la distancia desde cada nodo al nodo objetivo
+y selecciona el siguiente nodo a explorar basándose en la heurística.
+La función toma como entrada cuatro argumentos:
+graph: un diccionario que representa el grafo. Las claves del diccionario son los nodos del grafo y 
+    los valores son diccionarios que representan los vecinos y el peso de las aristas que los conectan.
+start: el nodo de inicio de la búsqueda.
+goal: el nodo objetivo de la búsqueda.
+heuristic: una función heurística que toma como entrada un nodo y devuelve una estimación de la distancia desde ese nodo al nodo objetivo.
 
+La función comienza comprobando si el nodo de inicio y el nodo objetivo son iguales. 
+Si son iguales, devuelve una lista que contiene solo el nodo de inicio.
+Luego, la función inicializa una pila con el nodo de inicio y su valor heurístico, y un conjunto de nodos explorados y un diccionario de padres. 
+El algoritmo utiliza la pila para almacenar los nodos que se explorarán en orden de su valor heurístico.
+El algoritmo utiliza un bucle while para explorar los nodos en la pila. 
+En cada iteración, el algoritmo obtiene el nodo con el menor valor heurístico de la pila, lo marca como explorado y explora sus vecinos. 
+Para cada vecino no explorado, el algoritmo calcula su valor heurístico, lo agrega a la pila con su costo acumulado y lo agrega al diccionario de padres.
+Si el nodo objetivo se encuentra durante la exploración, el algoritmo construye el camino desde el nodo objetivo hasta el nodo de inicio utilizando 
+el diccionario de padres y devuelve la lista de nodos del camino. Si no se encuentra un camino, la función devuelve None.
+En caso de no encontrar la solución el algoritmo entrará en estado de backtrack para recorrer otro camino repitiendo el proceso en busca de la solución.
 """
 
 #Función Greedy con pasos
-def greedy_con_pasos(graph, start, goal): #Joel Vázquez Anaya 
-    frontier = PriorityQueue()
-    frontier.put(start, 0)
+def greedy_con_pasos(graph, start, goal): #Javier Vázquez Gurrola 
+    if start == goal:
+        return [start]
+    # Inicializar la pila con el nodo de inicio y su valor heurístico
+    stack = [(start, 0, heuristic(start))]
+    # Inicializar el conjunto de nodos explorados y el diccionario de padres
     explored = set()
-    while not frontier.empty():
-        current = frontier.get()
+    parents = {}
+    while stack:
+         # Obtener el nodo de la pila con el menor valor heurístico
+        current, cost, h = stack.pop(0)
         print("Imprime actual")
         print(current)
         print("")
         if current == goal:
+            # Construir el camino desde el nodo objetivo hasta el nodo de inicio
+            path = [current]
+            while path[-1] != start:
+                path.append(parents[path[-1]])
+            print("Costo del camino:", cost)
             print("Esta es la lista de exploración")
             print(explored)
             print("")
-            break
+            return path[::-1]
+         # Marcar el nodo actual como explorado
         explored.add(current)
         print("Esta es la lista de los nodos explorados")
         print(explored)
         print("")
-        for neighbor in graph[current]:
+         # Explorar los vecinos del nodo actual
+        for neighbor, weight in graph[current].items():
             if neighbor not in explored:
                 print("Imprime los vecinos del nodo actual")
                 print(neighbor)
                 print("")
+                # Calcular el valor heurístico del vecino
+                h_neighbor = heuristic(neighbor)
+                # Agregar el vecino a la pila con su valor heurístico y su costo acumulado
+                stack.append((neighbor, cost + weight, h_neighbor))
+                # Agregar el vecino al diccionario de padres
+                parents[neighbor] = current
                 priority = heuristic(neighbor)
-                print("Imprime el vecino prioridad con base a la euristica")
+                print("Imprime el vecino prioridad con base a la heurística")
                 print(priority)
                 print("")
-                frontier.put(neighbor, priority)
                 print("Esta es la lista de los nodos explorados")
                 print(explored)
                 print("")
                 print("----------------------------------------------------------------------------------------")
-        return explored
+         # Ordenar la pila por el valor heurístico de los nodos restantes
+        stack = sorted(stack, key=lambda x: x[2])
+    # Si se llega a este punto, significa que no se encontró un camino
+    return None
     
-#Función Greedy sin pasos
-def greedy(graph, start, goal): #Javier Vázquez Gurrola 
-    frontier = PriorityQueue()
-    frontier.put(start, 0)
+#Función Greedy sin pasos 
+def greedy(graph, start, goal): #Javier Vázquez Gurrola
+    if start == goal:
+        return [start]
+    # Inicializar la pila con el nodo de inicio y su valor heurístico
+    stack = [(start, 0, heuristic(start))]
+    # Inicializar el conjunto de nodos explorados y el diccionario de padres
     explored = set()
-    while not frontier.empty():
-        current = frontier.get()
+    parents = {}
+    while stack:
+        # Obtener el nodo de la pila con el menor valor heurístico
+        current, cost, h = stack.pop(0)
         if current == goal:
-            break
+            # Construir el camino desde el nodo objetivo hasta el nodo de inicio
+            path = [current]
+            while path[-1] != start:
+                path.append(parents[path[-1]])
+            print("Costo del camino:", cost)
+            return path[::-1]
+        # Marcar el nodo actual como explorado
         explored.add(current)
-        for neighbor in graph[current]:
+        # Explorar los vecinos del nodo actual
+        for neighbor, weight in graph[current].items():
             if neighbor not in explored:
-                priority = heuristic(neighbor)
-                frontier.put(neighbor, priority)
-        return explored
+                # Calcular el valor heurístico del vecino
+                h_neighbor = heuristic(neighbor)
+                # Agregar el vecino a la pila con su valor heurístico y su costo acumulado
+                stack.append((neighbor, cost + weight, h_neighbor))
+                # Agregar el vecino al diccionario de padres
+                parents[neighbor] = current
+        # Ordenar la pila por el valor heurístico de los nodos restantes
+        stack = sorted(stack, key=lambda x: x[2])
+    # Si se llega a este punto, significa que no se encontró un camino
+    return None
 """
 La función edge_cost toma una tupla de dos nodos y devuelve el costo de la arista que los conecta en el grafo.
 En otras palabras, dado un borde, esta función devuelve la distancia o el costo de viajar de un nodo a otro.
@@ -782,72 +827,7 @@ def stochastic_hill_climbing(graph, initial_node, heuristic):# Joel Vázquez Ana
             return current_node
 
 #Simulated annealing
-"""
-Es una búsqueda que se usa para encontrar el camino más ótimo al comparar todos los caminos
-para descubrir este resultado existen muchas maneras de sacarlo, como por medio de analisis
-random, la ruta de una hormiga al hormiguero y el de la función del viajero.
-Para resolver este caso se uso la función del viajero.
-Cantidad de vectores que se van a analizar, podemos pensarlos como los nodos que se usan
-más abajo para imprimir el grafo.
 
-"""
-v = 6
-#La función traelling salesman sirve para calcular el camino más corto
-def travelling_salesman_function(graph2, s):#Francisco Anaya Viveros
-  #lista vacia para almacenar el camino
-  vertex = []
-  #analizará para la cantidad de puntos
-  for i in range(v):
-    #si nuestra i es diferente de s se hace una append al vertex
-    if i != s:
-      vertex.append(i)
-  
-  min_path = maxsize
-  #Loop infinito
-  while True:
-    #costo incial
-    current_cost = 0
-    k = s
-    #haces el loop otra vez pero ahora con vertex
-    for i in range(len(vertex)):
-      #mi costo total debe incrementarse por el costo de vertex
-      current_cost += graph2[k][vertex[i]]
-      #vamos a guardar la posición del vertex cada vez que se guarde un valor
-      k = vertex[i]
-    current_cost += graph2[k][s]
-    #se va a calcular el vamor mínimo de un grafo comparando el valor mínimo con el del costo actual
-    min_path = min(min_path, current_cost)
-    #es una función que nos va a decir si existiera otro camino mínimo
-    if not next_perm(vertex):
-      break
-  return min_path
-#se llama a la lista
-def next_perm(l):
-  n = len(l)
-  i = n-2
-#si estoy en 1 puedo ir a 2 o 3 entonces veo la que tenga mayor costo y la eliminamos
-  while i >= 0 and l[i] > l[i+1]:
-    i -= 1
-#cuando nuestra i sea -1 significa que no se puede encontrar un camino mínimo
-  if i == -1:
-    return False
-#cuando se encuentra un camino mínimo entonces se ocupa la función con j
-  j = i+1
-  #solo comparo si es menos costo ir primero a 3 que a 2 o si al revés
-  while j < n and l[j] > l[i]:
-    j += 1
-  #cuando ya agrege ese camino me concentraré en un nuevo camino de ahí la reducción en 1
-  j -= 1
-  #va a servir para saber que camino tomar
-  l[i], l[j] = l[j], l[i]
-  left = i+1
-  right = n-1
-  #si por ejemplo estamos ya en 3, si deberíamos tomar camino hacía el punto 2 o 4
-  while left < right:
-    l[left], l[right] = l[right], l[left]
-    left += 1
-    right -= 1
-  return True
 
 def genetic_algorithm_con_pasos(graph, population_size, num_generations, mutation_rate):# Joel Vázquez Anaya
     population = generate_initial_population(population_size, graph)
@@ -1230,7 +1210,7 @@ def menu_muestra_pasos():
     opcion_menu2 = input("Ingrese el número de la opción que desea: ")
     return opcion_menu2
 
-def menu():#Joel Vázquez Anaya
+def menu():#Joel Vázquez Anaya y Javier Vázquez Gurrola
     print("Menú:")
     print("1.  Greedy best-first")
     print("2.  A* con peso")
@@ -1250,7 +1230,6 @@ def menu():#Joel Vázquez Anaya
     print("")
     return opcion
 
-#beam_width = 0
 opcion = None
 opcion_menu2 = None
 banderaOrigen = False

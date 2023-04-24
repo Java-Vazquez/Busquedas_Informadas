@@ -1045,6 +1045,96 @@ def mutate_population(population, mutation_rate, graph): #Joel Vázquez Anaya
     
     return mutated_population
 
+def simulated_annealing(initial_state, destination, adjacency_list, max_iterations, temperature): #Francisco Anaya Viveros
+    current_state = initial_state
+    current_cost = heuristic(current_state)
+    best_state = current_state
+    best_cost = current_cost
+    
+    for i in range(max_iterations):
+    # Generar un vecino aleatorio
+      neighbors = get_neighbors(current_state, adjacency_list)
+      next_state = random.choice(neighbors)
+      next_cost = heuristic(next_state)
+    
+    # Evaluar si se acepta el vecino
+      delta_cost = next_cost - current_cost
+      if delta_cost < 0:
+          current_state = next_state
+          current_cost = next_cost
+      else:
+          prob = math.exp(-delta_cost / temperature)
+          if random.random() < prob:
+              current_state = next_state
+              current_cost = next_cost
+    
+    # Actualizar la mejor solución encontrada
+      if current_cost < best_cost:
+          best_state = current_state
+          best_cost = current_cost
+    
+    # Actualizar la temperatura
+      temperature *= 0.9999
+        
+      return best_state, best_cost
+
+
+def get_neighbors(node, adjacency_list): #Francisco Anaya Viveros
+    return adjacency_list[node]
+
+
+def dibujar_mapa(): #Francisco Anaya Viveros
+  latitudes = {'Cancún': 21.1213285, 'Valladolid': 20.688114, 'Felipe Carrillo Puerto': 19.5778903, 'Campeche': 19.8305682, 'Merida': 20.9800512, 
+                 'Ciudad del Carmen': 18.6118375, 'Chetumal': 18.5221567, 'Villa Hermosa': 17.9925264, 'Tuxtla': 16.7459857, 'Francisco Escarcega': 18.6061556, 
+                 'Acayucan': 17.951096, 'Tehuantepec': 16.320636, 'Alvarado': 18.7760455, 'Oaxaca': 17.0812951, 'Puerto Angel': 15.6679974, 
+                 'Izucar de Matamoros': 18.5980563, 'Tehuacan': 18.462191, 'Pinotepa Nacional': 16.3442895, 'Cuernavaca': 18.9318685, 
+                 'Puebla': 19.040034, 'Acapulco': 16.8354485, 'Cdmx': 19.3898319, 'Iguala': 18.3444, 'Ciudad Altamirano': 18.3547491,
+                 'Cordoba': 18.8901707, 'Chilpancingo': 17.5477072, 'Tlaxcala': 19.4167798, 'Pachuca de Soto': 20.0825056, 'Queretaro': 20.6121228,
+                 'Toluca de Lerdo': 19.294109, 'Zihuatanejo': 17.6405745, 'Veracruz': 19.1787635, 'Tuxpan de Rodriguez Cano': 20.9596561, 
+                 'Atlacomulco': 19.7980152, 'Salamanca': 20.5664927, 'San Luis Potosi': 22.1127046, 'Playa Azul': 17.9842581, 'Tampico': 22.2662251, 
+                 'Guanajuato': 21.0250928, 'Morelia': 19.7036417, 'Guadalajara': 20.6737777, 'Aguascalientes': 21.8857199, 'Zacatecas': 22.7636293,
+                 'Durango': 24.0226824, 'Colima': 19.2400444, 'Manzanillo': 19.0775491, 'Ciudad Victoria': 23.7409928, 'Tepic': 21.5009822, 
+                 'Hidalgo del Parral': 26.9489283, 'Mazatlan': 23.2467283, 'Soto la Marina': 23.7673729, 'Matamoros': 25.8433787, 'Monterrey': 25.6487281, 
+                 'Chihuahua': 28.6708592, 'Topolobampo': 25.6012747, 'Culiacan': 24.8049008, 'Reynosa': 26.0312262, 'Monclova': 26.907775, 
+                 'Ciudad Juárez': 31.6538179, 'Janos': 30.8898127, 'Ciudad Obregon': 27.4827355, 'Torreon': 25.548597, 'Ojinaga': 29.5453292, 
+                 'Nuevo Laredo': 27.4530856, 'Agua Prieta': 31.3115272, 'Guaymas': 27.9272572, 'Piedras Negras': 28.6910517, 'Santa Ana': 30.5345457, 
+                 'Hermosillo': 29.082137, 'Mexicali': 32.6137391, 'Tijuana': 32.4966818, 'San Felipe': 31.009535, 'Ensenada': 31.8423096,
+                 'San Quintin': 30.5711324, 'Santa Rosalia': 27.3408761, 'Santo Domingo': 25.3487297, 'La Paz': 24.1164209, 'Cabo San Lucas': 22.8962253 }
+    
+  longitudes = {'Cancún': -86.9192738, 'Valladolid': -88.2204456, 'Felipe Carrillo Puerto': -88.0630853, 'Campeche': -90.5798365, 'Merida': -89.7029587, 
+                'Ciudad del Carmen': -91.8927345, 'Chetumal': -88.3397982, 'Villa Hermosa': -92.9881407, 'Tuxtla': -93.1996103, 'Francisco Escarcega': -90.8176486, 
+                'Acayucan': -94.9306961, 'Tehuantepec': -95.27521, 'Alvarado': -95.7731952, 'Oaxaca': -96.7707511, 'Puerto Angel': -96.4933733, 
+                'Izucar de Matamoros': -98.5076767, 'Tehuacan': -97.4437333, 'Pinotepa Nacional': -98.1315923, 'Cuernavaca': -99.3106054, 'Puebla': -98.2630056,
+                'Acapulco': -99.9323491, 'Cdmx': -99.7180148, 'Iguala': -99.5652232, 'Ciudad Altamirano': -100.6817619, 'Cordoba': -96.9751108, 
+                'Chilpancingo': -99.5324349, 'Tlaxcala': -98.4471127, 'Pachuca de Soto': -98.8268184, 'Queretaro': -100.4802576, 'Toluca de Lerdo': -99.6662331, 
+                'Zihuatanejo': -101.5601369, 'Veracruz': -96.2113357, 'Tuxpan de Rodriguez Cano': -97.4158767, 'Atlacomulco': -99.89317, 'Salamanca': -101.2176511, 
+                'San Luis Potosi': -101.0261099, 'Playa Azul': -102.357616, 'Tampico': -97.939526, 'Guanajuato': -101.3296402, 'Morelia': -101.2761644, 
+                'Guadalajara': -103.4054536, 'Aguascalientes': -102.36134, 'Zacatecas': -102.623638, 'Durango': -104.7177652, 'Colima': -103.7636273, 'Manzanillo': -104.4789574, 
+                'Ciudad Victoria': -99.1783576, 'Tepic': -104.9119242, 'Hidalgo del Parral': -105.8211168, 'Mazatlan': -106.4923175, 'Soto la Marina': -98.2157573, 
+                'Matamoros': -97.5849847, 'Monterrey': -100.4431819, 'Chihuahua': -106.2047036, 'Topolobampo': -109.0687891, 'Culiacan': -107.4933545, 'Reynosa': -98.3662435, 
+                'Monclova': -101.4940069, 'Ciudad Juárez': -106.5890206, 'Janos': -108.208458, 'Ciudad Obregon': -110.0844111, 'Torreon': -103.4719562, 'Ojinaga': -104.4305246, 
+                'Nuevo Laredo': -99.6881218, 'Agua Prieta': -109.5855873, 'Guaymas': -110.9779564, 'Piedras Negras': -100.5801829, 'Santa Ana': -111.1580567, 
+                'Hermosillo': -111.059027, 'Mexicali': -115.5203312, 'Tijuana': -117.087892, 'San Felipe': -114.8727296, 'Ensenada': -116.6799816, 'San Quintin': -115.9588544, 
+                'Santa Rosalia': -112.2825762, 'Santo Domingo': -111.9975909, 'La Paz': -110.3727673, 'Cabo San Lucas': -109.9505077}
+    
+  fig, ax = plt.subplots(1, 2, figsize=(35,15)) # especificar el tamaño de la figura
+    # Dibujar grafo antes de la búsqueda
+  pos = {k: (longitudes[k], latitudes[k]) for k in latitudes.keys()}
+  nx.draw(G, pos, with_labels=True, ax=ax[0]) # dibujar en el primer subplot
+  ax[0].set_title("Grafo antes de la búsqueda", fontsize=25) # establecer el título del primer subplot
+
+    # Realizar búsqueda
+  best_state, best_cost = simulated_annealing(start_verificado, goal_verificado, adjacency_list, max_iterations, temperature)
+
+    # Dibujar grafo después de la búsqueda
+  nx.draw(G, pos, with_labels=True, ax=ax[1]) # dibujar en el segundo subplot
+  nx.draw_networkx_nodes(G, pos, nodelist=[best_state], node_color='r', node_size=500)
+  ax[1].set_title("Grafo después de la búsqueda", fontsize=25) # establecer el título del segundo subplot
+
+    # Mostrar figura
+  plt.subplots_adjust(wspace=0.4) # ajustar espacio entre figuras
+  plt.show()
+
 
 def verificacion(nodo): #Javier Vázquez Gurrola 
   bandera = False
@@ -1141,55 +1231,87 @@ graph = {
             'Cabo San Lucas' : {}
         }
 
-#imprimir el grafo
-
-def print_graph(G):
-  # nodos
-  pos = nx.spring_layout(G, seed=7)
-  #color para poner el nombre en este caso azul
-  nx.draw_networkx_nodes(G, pos, node_color = 'blue', node_size = 5000)
-  #color de la letra que irá dentro del círculo
-  nx.draw_networkx_labels(G, pos, font_size=10, font_family="sans-serif", font_color='white')
-
-  # líneas
-  nx.draw_networkx_edges(
-      #líneas para marcar los pesos dentro que serán en color negro con una estilo dashed
-      G, pos, edgelist=G.edges, width=6, alpha=1, edge_color="black", style="dashed"
-      )
-  edge_labels = nx.get_edge_attributes(G, "weight")
-  #el texto del peso será hecho con el color de fuente rojo
-  nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=10, font_color='red')
-
-  # ploting
-  ax = plt.gca()
-  ax.margins(0.08)
-  plt.axis("off")
-  plt.tight_layout()
-  plt.show()
-
-G = nx.DiGraph()
-
-G.add_weighted_edges_from({
-    #cada nodo con sus pesos de donde se acomodarán para hacer el grafo después
-    ("Sibiu", "Rimnicu Vilcea", 80), ("Sibiu", "Fagaras", 99),
-    ("Rimnicu Vilcea", "Sibiu", 80), ("Fagaras", "Sibiu", 99),
-    ("Rimnicu Vilcea", "Craiova", 146), ("Rimnicu Vilcea", "Pitesti", 97),
-    ("Craiova", "Rimnicu Vilcea", 146), ("Pitesti", "Rimnicu Vilcea", 97),
-    ("Craiova", "Pitesti", 138),
-    ("Pitesti", "Craiova", 138),
-    ("Pitesti", "Bucharest", 101),
-    ("Bucharest", "Pitesti", 101),
-    ("Fagaras", "Bucharest", 211),
-    ("Bucharest", "Fagaras", 211),
-    ("Sibiu", "Craiova", 1000), ("Sibiu", "Pitesti", 1000), ("Sibiu", "Bucharest", 1000),
-    ("Craiova", "Sibiu", 1000), ("Pitesti", "Sibiu", 1000), ("Bucharest", "Sibiu", 1000),
-    ("Rimnicu Vilcea", "Fagaras", 1000), ("Rimnicu Vilcea", "Bucharest", 1000),
-    ("Fagaras", "Rimnicu Vilcea", 1000), ("Bucharest", "Rimnicu Vilcea", 1000),
-    ("Craiova", "Bucharest", 1000), ("Craiova", "Fagaras", 1000),
-    ("Bucharest", "Craiova", 1000), ("Fagaras", "Craiova", 1000),
-    ("Pitesti", "Fagaras", 1000),
-    ("Fagaras", "Pitesti", 1000),
-})
+# Grafo para simulated annealing
+adjacency_list = { #Francisco Anaya Viveros
+            'Cancún': ['Valladolid', 'Felipe Carrillo Puerto'],
+            'Valladolid' : ['Felipe Carrillo Puerto'],
+            'Felipe Carrillo Puerto': ['Campeche'],
+            'Campeche': ['Merida', 'Chetumal', 'Ciudad del Carmen'],
+            'Merida': [],
+            'Chetumal': ['Francisco Escarcega'],
+            'Francisco Escarcega' : [],
+            'Ciudad del Carmen': ['Villa Hermosa', 'Tuxtla'],
+            'Villa Hermosa': ['Acayucan'], 
+            'Tuxtla': ['Acayucan'],
+            'Acayucan': ['Tehuantepec', 'Alvarado'],
+            'Tehuantepec' : [],
+            'Alvarado'  : ['Oaxaca'],
+            'Oaxaca' : ['Puerto Angel', 'Tehuacan', 'Izucar de Matamoros'],
+            'Tehuacan' : [],
+            'Puerto Angel' : ['Pinotepa Nacional'],
+            'Pinotepa Nacional' : ['Acapulco'],
+            'Acapulco' : ['Chilpancingo'],
+            'Chilpancingo' : ['Iguala'],
+            'Iguala' : ['Cuernavaca', 'Ciudad Altamirano'],
+            'Izucar de Matamoros' : ['Puebla','Cuernavaca'],
+            'Puebla' : ['Cordoba','Cdmx'],
+            'Cordoba' : ['Veracruz'],
+            'Veracruz' : [],
+            'Cuernavaca' : ['Cdmx', 'Ciudad Altamirano'],
+            'Cdmx' : ['Pachuca de Soto','Queretaro','Toluca de Lerdo','Tlaxcala'],
+            'Tlaxcala' : [],
+            'Toluca de Lerdo' : ['Ciudad Altamirano'],
+            'Ciudad Altamirano' : ['Zihuatanejo'],
+            'Zihuatanejo' : ['Playa Azul'],
+            'Playa Azul' : ['Morelia','Colima','Manzanillo'],
+            'Morelia' : ['Colima', 'Salamanca'],
+            'Colima' : ['Manzanillo', 'Guadalajara'],
+            'Manzanillo' : ['Guadalajara'],
+            'Guadalajara' : ['Tepic','Aguascalientes'],
+            'Salamanca' : ['Guanajuato','Guadalajara'],
+            'Guanajuato' : ['Aguascalientes'],
+            'Aguascalientes' : ['San Luis Potosi'],
+            'Queretaro' : ['Salamanca', 'Atlacomulco', 'San Luis Potosi'],
+            'Atlacomulco' : [],
+            'Pachuca de Soto' : ['Tuxpan de Rodriguez Cano'],
+            'Tuxpan de Rodriguez Cano' : ['Tampico'],
+            'Tampico' : ['Ciudad Victoria'],
+            'Ciudad Victoria' : ['Soto la Marina','Matamoros','Monterrey','Durango'],
+            'Soto la Marina' : [],
+            'San Luis Potosi' : ['Zacatecas', 'Durango'],
+            'Zacatecas' :  [],
+            'Tepic' : ['Mazatlan'],
+            'Mazatlan' : ['Culiacan'],
+            'Durango' : ['Mazatlan', 'Hidalgo del Parral', 'Torreon'],
+            'Torreon' : ['Monclova'],
+            'Matamoros' : ['Reynosa'],
+            'Reynosa' : ['Nuevo Laredo'],
+            'Monterrey' : ['Nuevo Laredo', 'Monclova'],
+            'Nuevo Laredo' : ['Piedras Negras'],
+            'Piedras Negras' : ['Monclova'],
+            'Monclova' : ['Ojinaga'],
+            'Culiacan' : ['Topolobampo', 'Hidalgo del Parral'],
+            'Ojinaga' : ['Chihuahua'],
+            'Hidalgo del Parral' :  ['Chihuahua'],
+            'Chihuahua' : ['Ciudad Juárez','Janos'],
+            'Ciudad Juárez' : [],
+            'Topolobampo' : ['Ciudad Obregon', 'Hidalgo del Parral'],
+            'Ciudad Obregon' : ['Guaymas'],
+            'Guaymas' : ['Hermosillo'],
+            'Hermosillo' : ['Santa Ana'],
+            'Janos' : ['Agua Prieta'],
+            'Agua Prieta' : ['Santa Ana'],
+            'Santa Ana' : ['Mexicali'],
+            'Mexicali' : ['San Felipe', 'Tijuana'],
+            'Tijuana' : ['Ensenada'],
+            'San Felipe' : ['Ensenada'],
+            'Ensenada' : ['San Quintin'],
+            'San Quintin' : ['Santa Rosalia'],
+            'Santa Rosalia' : ['Santo Domingo'],
+            'Santo Domingo' : ['La Paz'],
+            'La Paz' : ['Cabo San Lucas'],
+            'Cabo San Lucas' : []
+        }
 
 # Función menú
 """
@@ -1219,7 +1341,7 @@ def menu():#Joel Vázquez Anaya y Javier Vázquez Gurrola
     print("5.  Branch and Bound")
     print("6.  Steepest hil climbing")
     print("7.  Stochastic hil clambing")
-    print("8.  Traveling Salesman")
+    print("8.  simulated Annealing")
     print("9.  Genetic Algorithm")
     print("10. Todos los anteriores")
     print("11. Mostrar grafo procesado")
@@ -1588,23 +1710,41 @@ while opcion != "12":
             print("Opción inválida, por favor seleccione una opción del 1 o 2")        
         
     elif opcion == "8":
-        #Ejecución del algoritmo Traveling Salesman
-        graph2 = [[0,80,99,1000,1000,1000],[88,0,1000,146,97,1000],[99,1000,0,0,1000,211],[1000,146,0,0,138,1000],[1000,97,1000,138,0,101],[1000,1000,211,1000,101,0]]
-        s = 0
-        tiempo_inicio = time.time()
-        res = travelling_salesman_function(graph2,s)
-        print("La ruta con menos costo es: " + str(res))
-        tiempo_fin = time.time()
-        tiempo_total_Traveling_Salesman = (tiempo_fin - tiempo_inicio)
-        print("La función tardó", tiempo_total_Traveling_Salesman, "segundos en ejecutarse")
-        print("----------------------------------------------------------------------------")
+        opcion_menu2 = menu_muestra_pasos()
+        while not banderaOrigen: 
+            start = input("Ingresa el nodo de origen: ")
+            start_verificado = start.title()
+            banderaOrigen = verificacion(start_verificado)
 
-        #Ejecución del algoritmo para generar la imagen del grafo
-        print(G.nodes())
-        print(G.edges())
-        print_graph(G)
-        print("----------------------------------------------------------------------------")
+        while not banderaDestino: #Joel Vázquez Anaya
+            goal = input("Ingresa el nodo de destino: ")
+            goal_verificado = goal.title()
+            banderaDestino = verificacion(goal_verificado)
+            print("----------------------------------------------------------------------------")
+
+        if opcion_menu2 == "1": 
+            #Ejecución del algoritmo simulated annealing con pasos
+           
+            print("----------------------------------------------------------------------------")
         
+        elif opcion_menu2 == "2":
+            #Ejecución del algoritmo simulated annealing
+            tiempo_inicio = time.time()
+            G = nx.Graph(adjacency_list)
+            max_iterations = int(input("Ingrese la cantidad de iteraciones maximas: "))
+            temperature = int(input("Ingrese la temperatura inicial: "))
+            best_state, best_cost = simulated_annealing(start_verificado, goal_verificado, adjacency_list, max_iterations, temperature)
+            print("Mejor estado encontrado:", best_state)
+            print("Costo del mejor estado:", best_cost)
+            dibujar_mapa()
+            tiempo_fin = time.time()
+            tiempo_total_Traveling_Salesman = (tiempo_fin - tiempo_inicio)
+            print("La función tardó", tiempo_total_Traveling_Salesman, "segundos en ejecutarse")
+            print("----------------------------------------------------------------------------")
+        
+        else:
+            print("Opción inválida, por favor seleccione una opción del 1 o 2")  
+
     elif opcion == "9":
         opcion_menu2 = menu_muestra_pasos()
         population_size = int(input("Ingrese el tamaño de la población: "))
